@@ -165,7 +165,8 @@ B<NOTE:> You must make F<pandoc_texlogo.pl> executable first!
 =head1 DESCRIPTION
 
 pandoc_texlogo.pl is a L<pandoc|http://johnmacfarlane.net/pandoc/>
-filter to help display the logos for TeX, LaTeX etc. correctly in *TeX
+filter to help display the logos for TeX, LaTeX etc. correctly in in
+LaTeX (including when generating PDF!) and ConTeXt output
 while also rendering them sensibly in other formats.
 
 =head1 OPTIONS
