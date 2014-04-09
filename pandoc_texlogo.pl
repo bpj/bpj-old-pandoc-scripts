@@ -131,7 +131,7 @@ pandoc_texlogo.pl - Pandoc filter to display TeX logos intelligently.
 
     pandoc -F pandoc_texlogo.pl --to=latex input.md
 
-    I write about \LaTeX{}!
+    I write about \TeX{}!
 
     
     pandoc -F pandoc_texlogo.pl --to=html input.md
