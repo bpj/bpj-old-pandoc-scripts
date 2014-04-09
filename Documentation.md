@@ -5,4 +5,4 @@ For a short description of each script along with a link to the documentation co
 [README]: https://github.com/bpj/bpj-pandoc-scripts/blob/master/README.md
 
 
--   [pandoc_texlogo.pl](pandoc-texlogo-pl)
+-   [pandoc_texlogo.pl](pandoc_texlogo.pl)
