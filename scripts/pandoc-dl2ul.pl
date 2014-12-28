@@ -206,9 +206,6 @@ sub _get_opt_list {
 
 __END__
 
-
-
-
 # BEGIN GENERATED POD #
 
 =pod

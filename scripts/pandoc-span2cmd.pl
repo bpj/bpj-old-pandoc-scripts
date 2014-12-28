@@ -382,10 +382,6 @@ sub TO_JSON {                                   # {{{2}}}
 
 __END__
 
-
-
-
-
 # BEGIN GENERATED POD #
 
 =pod

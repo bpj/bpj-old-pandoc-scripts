@@ -301,9 +301,6 @@ sub mk_elem {
 
 __END__
 
-
-
-
 # BEGIN GENERATED POD #
 
 =pod

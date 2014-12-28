@@ -1,17 +1,17 @@
 # NAME
 
-pandoc-plain2perlpod.pl - a pandoc filter to munge plain output into Perl
+pandoc-plain2pod.pl - a pandoc filter to munge plain output into Perl
 POD documentation.
 
 # SYNOPSIS
 
-    pandoc -w plain -F pandoc-plain2perlpod.pl [OPTIONS]  FILE_NAME ...
+    pandoc -w plain -F pandoc-plain2pod.pl [OPTIONS]  FILE_NAME ...
 
 # DESCRIPTION
 
 <div id="short_description">
 
-pandoc-plain2perlpod.pl is a pandoc filter to munge plain output into Perl
+pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl
 POD documentation, a poor man's custom writer implemented as a filter if
 you will.
 

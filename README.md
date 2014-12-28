@@ -18,7 +18,7 @@ No documentation yet!
 
 ### pandoc-plain2pod.pl
 
-pandoc-plain2perlpod.pl is a pandoc filter to munge plain output into Perl POD documentation, a poor man's custom writer implemented as a filter if you will.
+pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl POD documentation, a poor man's custom writer implemented as a filter if you will.
 
 ### pandoc-span2cmd.pl
 

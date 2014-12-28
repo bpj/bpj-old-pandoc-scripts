@@ -388,10 +388,6 @@ sub _gen_emph {	# {{{2}}}
 
 __END__
 
-
-
-
-
 # BEGIN GENERATED POD #
 
 =pod
@@ -400,18 +396,18 @@ __END__
 
 =head1 NAME
 
-pandoc-plain2perlpod.pl - a pandoc filter to munge plain output into
-Perl POD documentation.
+pandoc-plain2pod.pl - a pandoc filter to munge plain output into Perl
+POD documentation.
 
 =head1 SYNOPSIS
 
-    pandoc -w plain -F pandoc-plain2perlpod.pl [OPTIONS]  FILE_NAME ...
+    pandoc -w plain -F pandoc-plain2pod.pl [OPTIONS]  FILE_NAME ...
 
 =head1 DESCRIPTION
 
-pandoc-plain2perlpod.pl is a pandoc filter to munge plain output into
-Perl POD documentation, a poor man's custom writer implemented as a
-filter if you will.
+pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl
+POD documentation, a poor man's custom writer implemented as a filter if
+you will.
 
 It works by replacing or wrapping certain Pandoc AST elements with Span,
 Div and other elements with raw POD markup injected into their contents

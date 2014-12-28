@@ -106,9 +106,6 @@ print encode_json $data;
 
 __END__
 
-
-
-
 # BEGIN GENERATED POD #
 
 =pod
