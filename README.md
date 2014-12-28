@@ -24,4 +24,8 @@ pandoc-plain2perlpod.pl is a pandoc filter to munge plain output into Perl POD d
 
 No documentation yet!
 
+### pandoc-texlogo.pl
+
+pandoc-texlogo.pl is a [pandoc](http://johnmacfarlane.net/pandoc/) filter to help display the logos for TeX, LaTeX etc. correctly in in LaTeX (including when generating PDF!) and ConTeXt output while also rendering them sensibly in other formats.
+
 
