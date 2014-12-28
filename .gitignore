@@ -1,5 +1,7 @@
-*.sw[op]
+*.sw[opn]
 _*
 *.html
 *.pdf
+*.pod
+bpj-pandoc-scripts.wiki/
 
