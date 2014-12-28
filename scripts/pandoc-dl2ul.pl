@@ -207,15 +207,6 @@ sub _get_opt_list {
 __END__
 
 
-=pod
-
-=encoding UTF-8
-
-No documentation yet!
-
-=cut
-
-
 
 
 # BEGIN GENERATED POD #
