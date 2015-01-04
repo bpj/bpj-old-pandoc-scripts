@@ -3,6 +3,11 @@ NAME
 
 pandoc-plain2pod.pl - a pandoc filter to munge plain output into Perl POD documentation.
 
+VERSION
+=======
+
+0.3
+
 SYNOPSIS
 ========
 
@@ -13,6 +18,7 @@ DESCRIPTION
 
 pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl POD documentation, a poor man's custom writer implemented as a filter if you will.
 
+<!-- DESCRIPTION -->
 It works by replacing or wrapping certain Pandoc AST elements with Span, Div and other elements with raw POD markup injected into their contents lists as inline Code elements which the plain writer renders as unadorned verbatim text.
 
 HOW TEXT ELEMENTS ARE 'TRANSLATED'
@@ -171,6 +177,3 @@ LICENSE
 =======
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
-SEE ALSO
-========

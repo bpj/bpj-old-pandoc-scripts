@@ -1,7 +1,7 @@
 NAME
 ====
 
-pandoc-texlogo.pl - Pandoc filter to display TeX logos intelligently.
+pandoc-texlogo.pl - pandoc filter to display TeX logos intelligently.
 
 VERSION
 =======
@@ -11,49 +11,12 @@ VERSION
 SYNOPSIS
 ========
 
-    pandoc -F pandoc_texlogo.pl [OPTIONS]  FILE_NAME ...
-
--   In `input.md`:
-
-        I write about `TeX`{.texlogo}!
-
--   Then:
-
-        pandoc -F pandoc_texlogo.pl --to=latex input.md
-
-        I write about \TeX{}!
-
-
-        pandoc -F pandoc_texlogo.pl --to=html input.md
-
-        <p>I write about <span class="texlogo">T<sub>e</sub>X</span>!</p>
-
-
-        pandoc -F pandoc_texlogo.pl --to=markdown input.md
-
-        I write about TeX!
-
--   In your HTML template:
-
-        $if(include-css)$
-        <style type="text/css">
-        <!--
-        $for(include-css)$
-        $include-css$
-        $endfor$
-        -->
-        </style>
-
--   or:
-
-        perl pandoc_texlogo.pl --css >texlogo.css
-
-**NOTE:** You must make `pandoc_texlogo.pl` executable first!
+    pandoc -F pandoc-texlogo.pl [OPTIONS] [-|FILE...]
 
 DESCRIPTION
 ===========
 
-pandoc-texlogo.pl is a [pandoc](http://johnmacfarlane.net/pandoc/) filter to help display the logos for TeX, LaTeX etc. correctly in in LaTeX (including when generating PDF!) and ConTeXt output while also rendering them sensibly in other formats.
+pandoc-texlogo.pl is a [pandoc](http://pandoc.org/) filter to help display the logos for TeX, LaTeX etc. correctly in in LaTeX (including when generating PDF!) and ConTeXt output while also rendering them sensibly in other formats.
 
 OPTIONS
 =======
@@ -133,10 +96,15 @@ Install these with your favorite CPAN client. (try `perldoc cpan` on the command
 -   autovivification
 -   indirect
 
+LICENSE
+=======
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
 AUTHOR
 ======
 
-Benct Philip Jonsson <bpjonsson@gmail.com>
+Benct Philip Jonsson \<bpjonsson@gmail.com\>
 
 COPYRIGHT
 =========
