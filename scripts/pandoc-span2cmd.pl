@@ -299,6 +299,7 @@ sub new {              # {{{3}}}
   KV:
     for my $kv ( @cmds ) {
         my ( $key, $cmd ) = @$kv;
+        $cmd =~ s{\A(\pL+)\*}{$1\_star}; # starred commands
         if ( $cmd =~ /[\[\]\{\}]/ ) {
             $cmd =~ /\A(\pL+)/    # The command
               and push @$classes, $option->{"$key\_class_prefix"} . $1;
