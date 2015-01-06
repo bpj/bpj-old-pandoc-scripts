@@ -389,7 +389,419 @@ __END__
 
 =encoding UTF-8
 
-No documentation yet!
+=head1 NAME
+
+pandoc-span2cmd.pl - pandoc filter to help simulating Markdown inside
+LaTeX commands/environments and produce HTML and LaTeX from the same
+source.
+
+=head1 VERSION
+
+0.5
+
+=head1 SYNOPSIS
+
+In your Markdown file:
+
+    \definecolor{blueborder}{rgb}{0,0,1}
+
+    Press the button marked
+    <span cmd=fcolorbox#blueborder%white>`POWER`{cmd=textsf cmd=color#blue}</span>.
+
+    The shining blue light is a `led`{cmd=textsc}.
+
+    **<span cmd=color#red>WARNING:</span>**
+    `Always`{cmd=uuline} unplug the chord before smashing the device!
+
+    There is no Russian version of the manual.
+    `«Ничего!»`{.textrussian. lang=ru}
+
+    <div env=greek#[variant=ancient] lang=grc>
+
+    ---
+    # Freely use markdown inside an 'environment'!
+    ...
+
+    | `Ἄφοβον`{.uline.} ὁ **θεός**,
+    | `ἀνύποπτον`{.uline.} ὁ **θάνατος**
+    | καὶ **τἀγαθὸν** μὲν `εὔκτητον`{.uline.},
+    | τὸ δὲ **δεινὸν** `εὐεκκαρτέρητον`{.uline.}
+
+    </div>
+
+Produce LaTeX:
+
+    pandoc -F pandoc-span2cmd.pl -w latex source.md
+
+
+    \definecolor{blueborder}{rgb}{0,0,1}
+
+    Press the button marked
+    {\fcolorbox{blueborder}{white}{{\textsf{\color{blue}{POWER}}}}}.
+
+    The shining blue light is a {\textsc{led}}.
+
+    \textbf{{\color{red}{WARNING:}}} {\uuline{Always}} unplug the chord
+    before smashing the device!
+
+    There is no Russian version of the manual. {\textrussian{«Ничего!»}}
+
+    \begin{greek}[variant=ancient]
+
+    {\uline{Ἄφοβον}} ὁ \textbf{θεός},\\{\uline{ἀνύποπτον}} ὁ
+    \textbf{θάνατος}\\καὶ \textbf{τἀγαθὸν} μὲν {\uline{εὔκτητον}},\\τὸ δὲ
+    \textbf{δεινὸν} {\uline{εὐεκκαρτέρητον}}
+
+    \end{greek}
+
+Produce HTML (example reformatted for readability):
+
+    pandoc -F pandoc-span2cmd.pl -w html source.md
+
+
+    <p>
+        Press the button marked <span
+            class="fcolorbox-blueborder_white"><span
+            class="textsf color-blue">POWER</span></span>.
+    </p>
+    <p>
+        The shining blue light is a <span class="textsc">led</span>.
+    </p>
+    <p>
+        <strong><span class="color-red">WARNING:</span></strong>
+        <span class="uuline">Always</span> unplug the chord before
+        smashing the device!
+    </p>
+    <p>
+        There is no Russian version of the manual.
+        <span class= "textrussian" lang="ru">«Ничего!»</span>
+    </p>
+    <div class="greek" lang="grc">
+    <p>
+        <span class="uline">Ἄφοβον</span> ὁ <strong>θεός</strong>,<br>
+        <span class="uline">ἀνύποπτον</span> ὁ <strong>θάνατος</strong><br>
+        καὶ <strong>τἀγαθὸν</strong> μὲν <span class="uline">εὔκτητον</span>,<br>
+        τὸ δὲ <strong>δεινὸν</strong> <span class="uline">εὐεκκαρτέρητον</span>
+    </p>
+    </div>
+
+=head1 DESCRIPTION
+
+script_name.pl is a pandoc filter to help simulating Markdown inside
+LaTeX commands/environments and produce HTML and LaTeX from the same
+source.
+
+This is done by defining custom 'magic' attributes or classes. When
+producing HTML these become ordinary classes which can be styled with
+CSS, but when producing LaTeX they become command/environment names with
+or without extra attributes, while span contents become the (main)
+command attribute contents and div contents become either environment
+body contents, or command attribute contents.
+
+=head1 NORMAL USAGE
+
+There are three ways to mark out a span, div, code or codeblock element
+for special treatment by this filter:
+
+=over
+
+=item 1.
+
+The special span or code attribute I<< cmd >> (the span body may contain
+Markdown):
+
+Markdown source:
+
+    <span cmd=textsf>**bold sans text**</span>
+
+LaTeX output:
+
+    {\textsf{\textbf{sans text}}}
+
+HTML output:
+
+    <span class="textsf"><strong>bold sans text</strong></span>
+
+=item 2.
+
+The special div or codeblock attributes I<< env >> or I<< cmd >> (the
+div body may contain Markdown):
+
+Markdown source:
+
+    <div env=center>
+    <div cmd="colorbox#yellow">
+    This is a *centered* textbox with *yellow* background
+    </div>
+    </div>
+
+LaTeX output:
+
+    \begin{center}
+
+    \colorbox{yellow}{
+
+    This is a \emph{centered} textbox with \emph{yellow} background
+
+    }
+
+    \end{center}
+
+HTML output:
+
+    <div class="center">
+    <div class="colorbox-yellow">
+    <p>This is a <em>centered</em> textbox with <em>yellow</em> background</p>
+    </div>
+    </div>
+
+=item 3.
+
+Class names consisting of letters followed by a period ('code' becomes
+ordinary text, but no Markdown inside!):
+
+Markdown source:
+
+    `sans text`{.textsf.}
+
+    ``` {.center.}
+    Centered text.
+    ```
+
+LaTeX output:
+
+    {\textsf{sans text}}
+
+    \begin{center}
+
+    Centered text.
+
+    \end{center}
+
+HTML output:
+
+    <p><span class="textsf">sans text</span></p>
+    <div class="center">
+    <p>Centered text</p>
+    </div>
+
+=over
+
+=item B<< Notes: >>
+
+=over
+
+=item 1.
+
+You can use e.g.
+C<< <span class="textsc.">LaTeX</span> but it doesn't give the nice 'dot-delimited' look you get with code attributes, and is more to type than >>cmd=textsc`,
+so no gain!
+
+=item 2.
+
+You can use I<< cmd >> or I<< env >> attributes with 'code'. This is
+useful as it allows you to specify extra arguments or turning
+'codeblocks' into commands.
+
+=item 3.
+
+The entire 'code' or 'codeblock' text becomes a single string element
+wrapped in a span element or a paragraph and a div element, so you
+cannot use any Markdown, LaTeX or HTML markup inside the 'code's text.
+This means that this form is mainly useful for single words or phrases,
+allowing you to avoid the extra noise introduced by HTML-like start and
+end tags. If you are only going to produce LaTeX this gives you no
+advantage over embedded raw LaTeX but it allows LaTeX commands to double
+as HTML classes.
+
+=item 4.
+
+Note that while a 'dotted' class on inline 'code' is equivalent to a
+span with a I<< cmd >> attribute, a 'dotted' class on a 'codeblock' is
+equivalent to a div with an I<< env >> attribute.
+
+=back
+
+=back
+
+=back
+
+You may have more than one I<< cmd >>/I<< env >> attribute, or more than
+one 'dotted' class at the same time. They will become several nested
+LaTeX commands or several HTML classes:
+
+    <span cmd=textsc cmd=textsf>sans small caps</span>
+
+    {\textsc{\textsf{sans small caps}}}
+
+    <span class="textsc textsf">sans small caps</span>
+
+=head3 The 'syntax' of I<< cmd >> and I<< env >> attribute values
+
+=head3 The clean way
+
+It is probably cleanest to let the I<< cmd >> and I<< env >> attributes
+be a single word (which must be a valid LaTeX command name, and so must
+contain only letters, although XeLaTeX allows you to use any Unicode
+character with General Category I<< L >>!),
+
+    <span cmd=blueWhiteBox>bordered blue text on white</span>
+
+and then define that command or environment in a LaTeX file
+
+which you include with pandoc's C<< -H >> option:
+
+    pandoc -F pandoc-span2cmd.pl -w latex -H defs.ltx source.md
+
+=head3 The messy way
+
+The filter also supports overloading the I<< cmd >> or I<< env >>
+attribute value with information on extra arguments to insert before and
+after the 'main' argument with the span or div contents, so that you in
+many cases won't need to write any LaTeX command definitions. You will
+always need to write your CSS stylesheet, however!
+
+The value of the I<< cmd >> attribute can have between one and three
+main parts, separated by C<< # >> characters:
+
+    cmd="COMMAND#{ARGS}{BEFORE}{ELEMENT}{BODY}#{ARGS}{AFTER}{ELEMENT}{BODY}"
+
+or
+
+    cmd="COMMAND#ARGS%BEFORE%ELEMENT%BODY#ARGS%AFTER%ELEMENT%BODY"
+
+In both forms only the first part (C<< COMMAND >>) is required. The
+other two parts may be missing or empty, but if there are to be extra
+arguments after the span/div body but not before, the second part must
+of course be present but empty.
+
+What distinguishes the first form from the second is the presence of one
+or more of the characters C<< { } [ ] >> in the second or third part
+
+When producing LaTeX both forms become
+
+    \COMMAND{ARGS}{BEFORE}{ELEMENT}{BODY}{...}{ARGS}{AFTER}{ELEMENT}{BODY}
+
+where C<< ... >> marks the spot where the LaTeX which pandoc produces
+from the span/div contents will be. In the second form any C<< % >>
+characters in the second or third part will be replaced with the
+character pair C<< }{ >> making each subpart a separate argument.
+
+When producing HTML the second form is turned into an HTML class so that
+all C<< # >> characters will be replaced with a hyphen (C<< - >>) and
+all percent characters will be replaced with an underscore
+
+    class="COMMAND-ARGS_BEFORE_ELEMENT_BODY-ARGS_AFTER_ELEMENT_BODY"
+
+If the needed extra LaTeX arguments are any more complicated than this,
+e.g. there is an argument delimited by square brackets, or the result
+will not be a valid HTML class, then you have to use the first form and
+specify your HTML classes and your extra LaTeX arguments explicitly:
+
+    <span cmd="colorbox#[rgb]{1,1,0}" class=yellowbox>text on yellow background</span>
+
+    {\colorbox[rgb]{1,1,0}{text on yellow background}}
+
+    <span class="yellowbox colorbox">text on yellow background</span>
+
+The I<< env >> attribute is treated similarly, except that it doesn't
+support any after-arguments; a second C<< # >> character will be treated
+as if it were a C<< % >> character.
+
+    <div env="minipage#10cm">
+    Text in minipage.
+    </div>
+
+    \begin{minipage}{10cm}
+
+    Text in minipage.
+
+    \end{minipage}
+
+    <div class="minipage-10cm">
+    <p>Text in minipage.</p>
+    </div>
+
+=head1 DEFINING CSS RULES (OR LATEX COMMANDS)
+
+For producing HTML you will have to define CSS rules for the classes
+derived from I<< cmd >> and I<< env >> attributes. Most of the time this
+means that you will have classes with the same names as LaTeX commands.
+This is not a bad thing if those who read your HTML know LaTeX, at least
+as long as yore CSS assigns reasonable properties to those classes! CSS
+rules corresponding to simple commands can be comparably simple:
+
+    span.textsf { font-family: sans-serif; }
+    span.textsc { font-variant: small-caps; }
+    div.center  { text-align: center; }
+    span.uline  { text-decoration: underline; } /* \usepackage[normalem]{ulem} */
+    div.fbox    { border: 1px solid black }
+
+Commands which take extra arguments need one selector per
+command+arguments combo:
+
+    div.fcolorbox-red_yellow {    /* \usepackage{xcolor} */
+        border: 1px solid red; background-color: yellow; }
+
+(Note that this example wouldn't have worked if C<< red >> and
+C<< yellow >> had been separate classes!)
+
+Sometimes you can simplify your Markdown by defining both CSS rules and
+LaTeX commands:
+
+    <div cmd="wmbox#10cm">
+    !!LIPSUM!!
+    </div>
+
+    div.wmbox-10cm { width: 10cm; margin-left: auto; margin-right: auto; }
+
+    \newcommand{\wmbox}[2]{\makebox[#1][c]{#2}}
+
+There are also cases where the best thing to do is to give HTML
+attributes I<< and >> LaTeX commands or environments side by side, as
+with the C<< lang >> attributes and [polyglossia][]
+commands/environments example in the L<< SYNOPSIS|#synopsis >>.
+
+    :lang(grc) { font-family: "GFS Neohellenic" }
+    :lang(ru)  { font-style: italic }
+
+    % See polyglossia and fontspec packages!
+    \newfontfamily\greekfont{GFS Neohellenic}[Script=Greek]
+    \newfontface\russianfont{Charis SIL Italic}[Script=Cyrillic] % <mainfont> Italic!
+
+=head1 POWER USAGE (FOR PERL HACKERS)
+
+TODO!
+
+(Some code is in place but there is an API change underway!)
+
+=head1 AUTHOR
+
+Benct Philip Jonsson E<lt>bpjonsson@gmail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2015- Benct Philip Jonsson
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Benct Philip Jonsson E<lt>bpjonsson@gmail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2015- Benct Philip Jonsson
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 

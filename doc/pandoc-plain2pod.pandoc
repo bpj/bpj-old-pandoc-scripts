@@ -1,21 +1,25 @@
-# NAME
+---
+author:
+  name:					Benct Philip Jonsson
+  email:              	bpjonsson@gmail.com
+copyright:            	2014- Benct Philip Jonsson
+script_name:          	pandoc-plain2pod.pl
+version:			  	'0.3' # Needs quotes to force stringification!
+oneline_description:  	a pandoc filter to munge plain output into Perl POD documentation.
+short_description: |
+    pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl
+    POD documentation, a poor man's custom writer implemented as a filter if
+    you will.
+synopsis: |
 
-pandoc-plain2pod.pl - a pandoc filter to munge plain output into Perl
-POD documentation.
-
-# SYNOPSIS
-
+    ```
     pandoc -w plain -F pandoc-plain2pod.pl [OPTIONS]  FILE_NAME ...
+    ```
 
-# DESCRIPTION
+...
 
-<div id="short_description">
 
-pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl
-POD documentation, a poor man's custom writer implemented as a filter if
-you will.
-
-</div>
+<!-- DESCRIPTION -->
 
 It works by replacing or wrapping certain Pandoc AST elements
 with Span, Div and other elements with raw POD markup injected 
@@ -219,23 +223,3 @@ any formatting code can be legally nested inside the `C<>` formatting code!
 A hack to make inline code elements with a `.file` class render
 as `F<< ... >>` formatting codes.
 
-# AUTHOR
-
-Benct Philip Jonsson \<bpjonsson\@gmail.com\>
-
-# COPYRIGHT
-
-Copyright 2014- Benct Philip Jonsson
-
-# LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-# SEE ALSO
-
-
-
----
-pod_escape_lt_gt: 1
-...

@@ -212,7 +212,16 @@ __END__
 
 =encoding UTF-8
 
+=head1 DESCRIPTION
+
 No documentation yet!
+
+TODO!
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 

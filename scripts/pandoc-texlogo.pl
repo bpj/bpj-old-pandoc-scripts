@@ -114,7 +114,7 @@ __END__
 
 =head1 NAME
 
-pandoc-texlogo.pl - Pandoc filter to display TeX logos intelligently.
+pandoc-texlogo.pl - pandoc filter to display TeX logos intelligently.
 
 =head1 VERSION
 
@@ -122,63 +122,14 @@ pandoc-texlogo.pl - Pandoc filter to display TeX logos intelligently.
 
 =head1 SYNOPSIS
 
-    pandoc -F pandoc_texlogo.pl [OPTIONS]  FILE_NAME ...
-
-=over
-
-=item *
-
-In C<< input.md >>:
-
-    I write about `TeX`{.texlogo}!
-
-=item *
-
-Then:
-
-    pandoc -F pandoc_texlogo.pl --to=latex input.md
-
-    I write about \TeX{}!
-
-
-    pandoc -F pandoc_texlogo.pl --to=html input.md
-
-    <p>I write about <span class="texlogo">T<sub>e</sub>X</span>!</p>
-
-
-    pandoc -F pandoc_texlogo.pl --to=markdown input.md
-
-    I write about TeX!
-
-=item *
-
-In your HTML template:
-
-    $if(include-css)$
-    <style type="text/css">
-    <!--
-    $for(include-css)$
-    $include-css$
-    $endfor$
-    -->
-    </style>
-
-=item *
-
-or:
-
-    perl pandoc_texlogo.pl --css >texlogo.css
-
-=back
-
-B<< NOTE: >> You must make C<< pandoc_texlogo.pl >> executable first!
+    pandoc -F pandoc-texlogo.pl [OPTIONS] [-|FILE...]
 
 =head1 DESCRIPTION
 
-pandoc-texlogo.pl is a L<< pandoc|http://johnmacfarlane.net/pandoc/ >>
-filter to help display the logos for TeX, LaTeX etc. correctly in in
-LaTeX (including when generating PDF!) and ConTeXt output while also
-rendering them sensibly in other formats.
+pandoc-texlogo.pl is a L<< pandoc|http://pandoc.org/ >> filter to help
+display the logos for TeX, LaTeX etc. correctly in in LaTeX (including
+when generating PDF!) and ConTeXt output while also rendering them
+sensibly in other formats.
 
 =head1 OPTIONS
 
@@ -333,10 +284,14 @@ indirect
 
 =back
 
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
 =head1 AUTHOR
 
-Benct Philip Jonsson
-L<< bpjonsson@gmail.com|mailto:bpjonsson@gmail.com >>
+Benct Philip Jonsson E<lt>bpjonsson@gmail.comE<gt>
 
 =head1 COPYRIGHT
 

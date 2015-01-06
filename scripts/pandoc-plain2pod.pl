@@ -46,12 +46,16 @@ my $option
     = get_meta_opts( 
       +{ 
           doc => $doc, 
-          opts => [ qw[ escape_lt_gt ] ], 
-          default => +{},
+          opts => [ qw[ escape_lt_gt cut ] ], 
+          default => +{ escape_lt_gt => 0, cut => 1 },
           prefix => q{pod_},
       }
   );
 
+# if(1) {
+#     use Data::Printer; 1;
+#     die p($option), p($doc->[0]);
+# }
 
 sub rmap_element_lists (&@);
 
@@ -261,7 +265,7 @@ my %handler_for = (
 );
 
 # wrap doc in =pod, =encoding and =cut commands # {{{1}}}
-PODBLOCK: {
+if( $option->{cut} ) {
     my $body = $doc->[1];
     unshift @$body, _mk_pod_block("# BEGIN GENERATED POD #\n\n=pod\n\n=encoding UTF-8" );
     push @$body, _mk_pod_block('=cut' );
@@ -277,7 +281,7 @@ rmap_hash {
     my $ret = $handler_for{$tag}->($_, @_); # $rmap);
     $_ = $ret if defined $ret;  # update current object unless handler aborted
     return;
-} $doc->[1];
+} $doc;
 
 
 print {*STDOUT} encode_json $doc;
@@ -399,6 +403,10 @@ __END__
 pandoc-plain2pod.pl - a pandoc filter to munge plain output into Perl
 POD documentation.
 
+=head1 VERSION
+
+0.3
+
 =head1 SYNOPSIS
 
     pandoc -w plain -F pandoc-plain2pod.pl [OPTIONS]  FILE_NAME ...
@@ -475,34 +483,34 @@ up as unindented verbatim plain text.
 
 =head2 Inline code
 
-Inline code (C<< `code()` >>) is wrapped in a POD
-C<< CE<lt>E<lt> ... E<gt>E<gt> >> formatting code.
+Inline code (C<< `code()` >>) is wrapped in a POD C<<< C<< ... >> >>>
+formatting code.
 See L<< NESTED FORMATTING CODES|/"NESTED FORMATTING CODES" >> below for
-how C<< E<lt> >> and C<< E<gt> >> inside code and nested formatting
-codes are handled (i.e. hopefully correctly).
+how C<< < >> and C<< > >> inside code and nested formatting codes are
+handled (i.e. hopefully correctly).
 
 =head2 Ordinary emphasis
 
 Ordinary emphasis (C<< *emph* >> or C<< _emph_ >>) is wrapped in a POD
-C<< IE<lt>E<lt> ... E<gt>E<gt> >> formatting code. See L<< NESTED
-FORMATTING CODES|/"NESTED FORMATTING CODES" >> below for how nested
-formatting codes are handled (i.e. hopefully correctly).
+C<<< I<< ... >> >>> formatting code. See L<< NESTED FORMATTING
+CODES|/"NESTED FORMATTING CODES" >> below for how nested formatting
+codes are handled (i.e. hopefully correctly).
 
 =head2 Strong emphasis
 
 Strong emphasis (C<< *strong* >> or C<< _strong_ >>) is wrapped in a POD
-C<< BE<lt>E<lt> ... E<gt>E<gt> >> formatting code. See L<< NESTED
-FORMATTING CODES|/"NESTED FORMATTING CODES" >> below for how nested
-formatting codes are handled (i.e. hopefully correctly).
+C<<< B<< ... >> >>> formatting code. See L<< NESTED FORMATTING
+CODES|/"NESTED FORMATTING CODES" >> below for how nested formatting
+codes are handled (i.e. hopefully correctly).
 
 =head2 Special characters
 
-The characters C<< E<lt> >> and C<< E<gt> >> in ordinary text are
-replaced by the POD entities C<< EE<lt>ltE<gt> >> and
-C<< EE<lt>gtE<gt> >>. Other special characters are left as literal
-UTF-8, and an C<< =encoding UTF-8 >> is inserted at the beginning of the
-POD. If you run into problems with that you should inform the
-maintainers of your POD formatters that we now live in the 21st century!
+The characters C<< < >> and C<< > >> in ordinary text are replaced by
+the POD entities C<< E<lt> >> and C<< E<gt> >>. Other special characters
+are left as literal UTF-8, and an C<< =encoding UTF-8 >> is inserted at
+the beginning of the POD. If you run into problems with that you should
+inform the maintainers of your POD formatters that we now live in the
+21st century!
 
 =head2 Links
 
@@ -573,42 +581,39 @@ exists is that it is so this filter itself inserts raw POD.
 The filter tries to do the right thing with nested formatting codes,
 i.e. as you go outwards each nesting level gets one angle bracket more
 in its delimiters, starting with double brackets at the innermost level
-because I find that more readable, except for C<< EE<lt>ltE<gt> >> and
-C<< EE<lt>gtE<gt> >> for literal C<< E<lt> >> and C<< E<gt> >> outside
-code: C<< **Foo _bar `baz`_** >> will be rendered as
-C<< BE<lt>E<lt>E<lt>E<lt> IE<lt>E<lt>E<lt> bar CE<lt>E<lt> baz E<gt>E<gt> E<gt>E<gt>E<gt> E<gt>E<gt>E<gt>E<gt> >>,
-should your Markdown contain something like that.
+because I find that more readable, except for C<< E<lt> >> and
+C<< E<gt> >> for literal C<< < >> and C<< > >> outside code:
+C<< **Foo _bar `baz`_** >> will be rendered as
+C<<<<< B<<<< I<<< bar C<< baz >> >>> >>>> >>>>>, should your Markdown
+contain something like that.
 
 The way the number of angle brackets around inline code which contains
 angle brackets is determined is rather crude but a least it avoids
 getting too few brackets in the delimiters: It matches the code string
-against the regex C<< /(\E<lt>+|\E<gt>+)/ >> and adds the length of the
-longest match to the counter keeping track of the formatting code
-nesting level, which is localized before the filtering routine recurses
-to process inner elements before inserting the delimiters of an outer
-element, so that the number of angle brackets in the delimiters
-increases outwards.
+against the regex C<< /(\<+|\>+)/ >> and adds the length of the longest
+match to the counter keeping track of the formatting code nesting level,
+which is localized before the filtering routine recurses to process
+inner elements before inserting the delimiters of an outer element, so
+that the number of angle brackets in the delimiters increases outwards.
 
-This means that something like C<< `$foo-E<gt>bar-E<gt>baz-E<gt>quux` >>
-will be rendered as
-C<< CE<lt>E<lt> $foo-E<gt>bar-E<gt>baz-E<gt>quux E<gt>E<gt> >> and
-something like C<< `20 E<lt>E<lt> 40` >> will be correctly rendered as
-C<< CE<lt>E<lt>E<lt> 20 E<lt>E<lt> 40 E<gt>E<gt>E<gt> >>. However in
-some cases the outer delimiters may get too 'wide', but they should
-never get too narrow.
+This means that something like C<< `$foo->bar->baz->quux` >> will be
+rendered as C<<< C<< $foo->bar->baz->quux >> >>> and something like
+C<<< `20 << 40` >>> will be correctly rendered as
+C<<<< C<<< 20 << 40 >>> >>>>. However in some cases the outer delimiters
+may get too 'wide', but they should never get too narrow.
 
-If you prefer to have C<< EE<lt>ltE<gt> >> and C<< EE<lt>gtE<gt> >> for
-literal C<< E<lt> >> and C<< E<gt> >> also in inline code you can set a
-metadata key C<< pod_escape_lt_gt >> to a true value either in a YAML
-metadata block in your Markdown file or with pandoc's C<< -M >> option
-on the command line. This is especially handy if your inline code
-exemplifies POD formatting codes, as any formatting code can be legally
-nested inside the C<< CE<lt>E<gt> >> formatting code!
+If you prefer to have C<< E<lt> >> and C<< E<gt> >> for literal C<< < >>
+and C<< > >> also in inline code you can set a metadata key
+C<< pod_escape_lt_gt >> to a true value either in a YAML metadata block
+in your Markdown file or with pandoc's C<< -M >> option on the command
+line. This is especially handy if your inline code exemplifies POD
+formatting codes, as any formatting code can be legally nested inside
+the C<< C<> >> formatting code!
 
 =head1 TODO
 
 A hack to make inline code elements with a C<< .file >> class render as
-C<< FE<lt>E<lt> ... E<gt>E<gt> >> formatting codes.
+C<<< F<< ... >> >>> formatting codes.
 
 =head1 AUTHOR
 
@@ -622,8 +627,6 @@ Copyright 2014- Benct Philip Jonsson
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-=head1 SEE ALSO
 
 =cut
 
