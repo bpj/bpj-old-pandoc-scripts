@@ -72,7 +72,7 @@ BEGIN {
 
     sub _mk_pod_inline {	# {{{2}}}
         my( $text ) = @_;
-        return _mk_elem( Code => [ ['',['raw_pod'],[]] => $text ] );
+        return _mk_elem( Str => $text );
     }
 
     sub _mk_pod_block {	# {{{2}}}
