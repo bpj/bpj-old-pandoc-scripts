@@ -10,7 +10,7 @@
 
 =head1 # VERSION
 
- 0.5.2
+ 0.5.3
 
 =head1 # SYNOPSIS
  
@@ -65,7 +65,7 @@
 
  Download the Strawberry Perl installer and install it:
 
-    <http://strawberryperl.com/>
+ <http://strawberryperl.com/>
 
 =head2 ## Installing the prerequisite Perl modules.
 
@@ -515,7 +515,7 @@ BEGIN {
             pod2usage(
                 -verbose => 99,
                 -exitval => 0,
-                -sections => '# VERSION|# NAME|# SUPPORT|# COPYRIGHT AND LICENSE',
+                -sections => '# VERSION|# NAME|# SUPPORT|# COPYRIGHT|# LICENSE',
             );
         }
         elsif ( $opt{markdown} ) {
