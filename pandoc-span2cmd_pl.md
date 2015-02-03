@@ -6,7 +6,7 @@ pandoc-span2cmd.pl - pandoc filter for Markdown inside LaTeX commands/environmen
 VERSION
 =======
 
-0.5.3
+0.5.4
 
 SYNOPSIS
 ========
@@ -352,7 +352,7 @@ Sometimes you can simplify your Markdown by defining both CSS rules and LaTeX co
 
      \newcommand{\wmbox}[2]{\makebox[#1][c]{#2}}
 
-There are also cases where the best thing to do is to give HTML attributes *and* LaTeX commands or environments side by side, as with the `lang` attributes and [polyglossia][] commands/environments example in the [SYNOPSIS](https://metacpan.org/pod/#synopsis).
+There are also cases where the best thing to do is to give HTML attributes *and* LaTeX commands or environments side by side, as with the `lang` attributes and [polyglossia][] commands/environments example in the [EXAMPLE](#example).
 
      :lang(grc) { font-family: "GFS Neohellenic" }
      :lang(ru)  { font-style: italic }
