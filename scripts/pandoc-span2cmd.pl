@@ -1,18 +1,9 @@
 #!/usr/bin/env perl
 
-# You can set the following options in the document metadata: # {{{1}}}
+# pandoc-span2cmd.pl - a pandoc filter to turn pandoc spans/divs into LaTeX commands or environments.
 #
-# ---
-# # option: '`value`'    # description
-#
-#
-# # For best performance wrap value in backticks *and* single quotes!
-# ...
-#
-# or on the commandline:
-#
-# -M OPTION='VALUE'
-#
+# Documentation at 
+# <https://github.com/bpj/bpj-pandoc-scripts/wiki/pandoc-span2cmd_pl>
 
 # SETUP                                         # {{{1}}}
 package _BPJ::PandocFilter::Span2Cmd;
