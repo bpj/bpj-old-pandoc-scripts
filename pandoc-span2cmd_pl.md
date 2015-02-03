@@ -6,7 +6,7 @@ pandoc-span2cmd.pl - pandoc filter for Markdown inside LaTeX commands/environmen
 VERSION
 =======
 
-0.5.2
+0.5.3
 
 SYNOPSIS
 ========
