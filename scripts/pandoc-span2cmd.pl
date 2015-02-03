@@ -10,7 +10,7 @@
 
 =head1 # VERSION
 
- 0.5.1
+ 0.5.2
 
 =head1 # SYNOPSIS
  
@@ -490,8 +490,8 @@ BEGIN {
         'help|h:s'       ,
         'version|v'      ,
         'markdown|md|m'   ,
-        'list-prereqs'   ,
-        'install-prereqs',
+        'list_prereqs|list-prereqs|listprereqs'   ,
+        'install_prereqs|install-prereqs|installprereqs',
       ) || pod2usage( -verbose => 99, -exitval => 2, -sections => '# SYNOPSIS');
     if ( keys %opt ) {
         my %section = (    #
