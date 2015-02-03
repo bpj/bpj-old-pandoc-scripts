@@ -10,7 +10,7 @@
 
 =head1 # VERSION
 
- 0.5.3
+ 0.5.4
 
 =head1 # SYNOPSIS
  
@@ -418,7 +418,7 @@
  There are also cases where the best thing to do is to give HTML
  attributes _and_ LaTeX commands or environments side by side, as
  with the `lang` attributes and \[polyglossia\]\[\]
- commands/environments example in the [SYNOPSIS](https://metacpan.org/pod/#synopsis).
+ commands/environments example in the [EXAMPLE](#example).
 
      :lang(grc) { font-family: "GFS Neohellenic" }
      :lang(ru)  { font-style: italic }
