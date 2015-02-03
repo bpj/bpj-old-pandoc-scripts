@@ -6,7 +6,7 @@ pandoc-span2cmd.pl - pandoc filter for Markdown inside LaTeX commands/environmen
 VERSION
 =======
 
-0.5.1
+0.5.2
 
 SYNOPSIS
 ========
@@ -56,7 +56,7 @@ If you are on Windows and don't have perl installed.
 
 Download the Strawberry Perl installer and install it:
 
-    <http://strawberryperl.com/>
+<http://strawberryperl.com/>
 
 Installing the prerequisite Perl modules.
 -----------------------------------------
