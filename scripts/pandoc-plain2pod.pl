@@ -19,6 +19,8 @@ use strict;
 use warnings FATAL => 'all';
 no warnings qw[ uninitialized numeric ];
 
+my $VERSION = '0.003000';
+
 use utf8;  # No UTF-8 I/O with JSON.pm!
 
 use autodie 2.12;

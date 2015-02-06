@@ -461,6 +461,8 @@ use strict;
 use warnings FATAL => 'all';
 no warnings qw[ uninitialized numeric ];
 
+my $VERSION = '0.005004';
+
     use Pod::Usage;
     use Getopt::Long qw[ GetOptionsFromArray :config no_ignore_case ];
 BEGIN {

@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+my $VERSION = '0.003000';
+
 # pandoc_texlogo.pl - turn "`LaTeX`{.logo}" etc. into "\LaTeX" when
 # generating LaTeX and into "LaTeX" when generating HTML and other
 # formats.
