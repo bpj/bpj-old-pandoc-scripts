@@ -14,7 +14,7 @@
 # -M option='value'
 #
 
-use 5.010_001;
+use 5.010001;
 use strict;
 use warnings FATAL => 'all';
 no warnings qw[ uninitialized numeric ];

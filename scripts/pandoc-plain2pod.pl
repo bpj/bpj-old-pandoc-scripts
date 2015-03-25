@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+package BPJ::Pandoc::Plain2pod;
+
 # You can set the following options in the document metadata:
 # 
 # ---
@@ -16,12 +18,12 @@
 
 # use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings; # FATAL => 'all';
 no warnings qw[ uninitialized numeric ];
 
 my $VERSION = '0.003000';
 
-use utf8;  # No UTF-8 I/O with JSON.pm!
+use utf8;  # No UTF-8 I/O with JSON!
 
 use autodie 2.12;
 
@@ -30,29 +32,33 @@ no autovivification; # Don't pullute the AST!
 
 # use Getopt::Long qw[ GetOptionsFromArray :config no_ignore_case ];
 
-use JSON qw[ decode_json encode_json ];
+use CLASS;
+use JSON::MaybeXS();
+use File::Basename qw[ basename ];
 use Data::Rmap qw[ rmap_hash rmap_array cut ]; # Data structure traversal support.
 use List::MoreUtils qw[ all any];
-use Scalar::Util qw[refaddr];
+use Scalar::Util qw[blessed refaddr];
 use List::Util qw[ max ];
 use Roman;
 use Number::Latin;
+
+my $SCRIPT = basename($0);
 
 my $to_format = shift @ARGV;
 
 # die "$0 requires 'plain' as --to format" unless 'plain' eq $to_format;
 
-my $doc = decode_json do { local $/; <>; };
+my $JSON = JSON::MaybeXS->new(utf8=>1, allow_blessed=>1, convert_blessed=>1);
+my $json = do { local $/; <>; };
+my $doc = $JSON->decode($json);
 
-my $option 
-    = get_meta_opts( 
-      +{ 
-          doc => $doc, 
-          opts => [ qw[ escape_lt_gt cut ] ], 
-          default => +{ escape_lt_gt => 0, cut => 1 },
-          prefix => q{pod_},
-      }
-  );
+my $option = get_meta_opts(
+    +{  doc     => $doc,
+        opts    => [qw[ escape_lt_gt cut preserve_divs ]],
+        default => +{ escape_lt_gt => 0, cut => 1, preserve_divs => 0 },
+        prefix  => q{pod_},
+    }
+);
 
 # if(1) {
 #     use Data::Printer; 1;
@@ -83,9 +89,13 @@ BEGIN {
 
     sub _mk_elem_with_class {	# {{{2}}}
         my( $tag, $contents, $class ) = @_;
-        return _mk_elem( $tag => [ ['',["$class"],[]], $contents ] );
+        $class = [$class] unless 'ARRAY' eq ref $class;
+        my $elem = _mk_elem( $tag => [ ['', $class, []], $contents ] );
+        return bless $elem => CLASS; # Handler skips blessed objects
     }
     
+    sub TO_JSON { +{ %{$_[0]} } } # serialize blessed objects
+
     sub _max_angles {
         my($str_ref) = @_;
         return $option->{escape_lt_gt} ? 1
@@ -130,143 +140,193 @@ my %list = (    #
 
 my %handler_for = (
 
-    Emph => _gen_emph('I'),
+    Emph => _gen_emph( 'I' ),
 
-    Strong => _gen_emph('B'),
+    Strong => _gen_emph( 'B' ),
 
-    Str => sub { 	# {{{2}}}
-        # Escape < and > in literal strings.
-        my($elem) = @_;
+    Str => sub {    # {{{2}}}
+                    # Escape < and > in literal strings.
+        my ( $elem ) = @_;
         $elem->{c} =~ s/([<>])/$angle2ent{$1}/g;
         return $elem;
     },
 
-    Link => sub {	# {{{2}}}
-        my($elem, $rmap) = @_;
+    Link => sub {    # {{{2}}}
+        my ( $elem, $rmap ) = @_;
+
         # get the current formatting code nesting level
         # so that we can reset it later if it was null!
         my $orig_nested = $Nested;
+
         # init the formatting code nesting level counter before we recurse.
         $Nested ||= 1;
+
         # recurse into the link text to insert formatting codes as appropriate.
         $rmap->recurse;
-        my $text = $elem->{c}[0];      # link text: an array of inlines
-        my $url = $elem->{c}[1][0];    # url: a string
-        my $title = $elem->{c}[1][1];  # title: a string
-        # we don't bother translating CPAN/man links into pod/perldoc links;
-        # instead the author should provide the correct pod link string
-        # in the link title with a perldoc:|cpan:|pod:|man: prefix,
-        # and the url will be replaced with the rest of the title,
-        # prepending a pipe if the text is not empty.
-        # If the text is empty a link like 
-        # [](0 "cpan:Some::Mod") will do the right thing,
-        # and my pandoc-perldoc2non-pod.pl filter will do the right thing
-        # with zero urls when generating other formats!
+        my $text  = $elem->{c}[0];       # link text: an array of inlines
+        my $url   = $elem->{c}[1][0];    # url: a string
+        my $title = $elem->{c}[1][1];    # title: a string
+             # we don't bother translating CPAN/man links into pod/perldoc links;
+             # instead the author should provide the correct pod link string
+             # in the link title with a perldoc:|cpan:|pod:|man: prefix,
+             # and the url will be replaced with the rest of the title,
+             # prepending a pipe if the text is not empty.
+             # If the text is empty a link like
+             # [](0 "cpan:Some::Mod") will do the right thing,
+             # and my pandoc-pod2md script and Pod::Markdown subclass
+             # will do the right thing with zero URLs
+             # when generating markdown from pod!
         if ( $title =~ s{ \A (?: perldoc|cpan|pod|man ) : }{}x ) {
+
             # if there is a text there should be a pipe before the url
-            $url =  @$text ? "|$title" : $title;
+            $url = @$text ? "|$title" : $title;
         }
-        else { $url = '|' . $url }
+        else { $url = @$text ? '|' . $url : $url . '|' . $url }
+
         # add a formatting code nesting level for the link,
         # making a minimum of two.
         $Nested += 1;
+
         # construct the opening/closing delimiters
-        my($odel, $cdel) = _get_delimiters( $Nested );
+        my ( $odel, $cdel ) = _get_delimiters( $Nested );
+
         # add delimiters and url to the text
-        unshift @$text, _mk_pod_inline(qq{L$odel } );
-        push @$text, _mk_pod_inline("$url $cdel" );
+        unshift @$text, _mk_pod_inline( qq{L$odel } );
+        push @$text, _mk_pod_inline( "$url $cdel" );
+
         # reset delimiter nesting level *iff* it was null when we started,
         # otherwise it should propagate upwards!
         undef $Nested unless $orig_nested;
+
         # return a span, not a link element!
-        return _mk_elem_with_class( Span => $text => 'link' );
+        return _mk_elem_with_class( Span => $text => [qw(plain2pod link)] );
     },
 
-    Header => sub {	# {{{2}}}
-        my($elem) = @_;
-        my $contents = $elem->{c};    # [ \@attrs, \@text ]
-        my $level = shift @$contents; # header level 1--6
-        $level = 4 if $level > 4;     # pod knows only 4 levels
-        $elem->{t} = 'Div';           # covert to div to suppress writer formatting
-        my $text = $contents->[-1];  # header text as array of inlines
-        unshift @$text, _mk_pod_inline(qq{=head$level } );  # prepend pod command
-        $contents->[-1] = [ _mk_elem( Para => $text ) ];  # Div contents must be list of Blocks
+    Header => sub {    # {{{2}}}
+        my ( $elem ) = @_;
+        my $contents = $elem->{c};          # [ \@attrs, \@text ]
+        my $level    = shift @$contents;    # header level 1--6
+        $level = 4 if $level > 4;           # pod knows only 4 levels
+        $elem->{t} = 'Div';    # covert to div to suppress writer formatting
+        my $text = $contents->[-1];    # header text as array of inlines
+        unshift @$text, _mk_pod_inline( qq{=head$level } );    # prepend pod command
+        $contents->[-1]
+          = [ _mk_elem( Para => $text ) ];    # Div contents must be list of Blocks
         return $elem;
     },
 
-    Code => sub {	# {{{2}}}
-        my( $elem ) = @_;
+    Code => sub {                             # {{{2}}}
+        my ( $elem ) = @_;
         my $str = $elem->{c}[-1];
-        return _mk_pod_inline($str) if 'raw_pod' eq $elem->{c}[-2][1][0]; # leave raw pod as is
-        # local $Nested unless $Nested;
-        # cf. Link handler_for code!
+        return _mk_pod_inline( $str )
+          if 'raw_pod' eq $elem->{c}[-2][1][0];    # leave raw pod as is
+                                                   # local $Nested unless $Nested;
+                                                   # cf. Link handler_for code!
         my $orig_nested = $Nested;
         $Nested ||= 1;
-        $Nested += _max_angles(\$str) || 1;
-        my( $odel, $cdel) = _get_delimiters( $Nested);
+        $Nested += _max_angles( \$str ) || 1;
+        my ( $odel, $cdel ) = _get_delimiters( $Nested );
         $str =~ s/([<>])/$angle2ent{$1}/g if $option->{escape_lt_gt};
         my $classes = $elem->{c}[-2][1];
-        my $tag = 'C';
+        my $tag     = 'C';
+
         if ( any { /\A(?:fn|file(?:name)?)\z/ } @$classes ) {
-           $tag = 'F';
+            $tag = 'F';
         }
         undef $Nested unless $orig_nested;
-        return _mk_pod_inline("$tag$odel $str $cdel");
+        return _mk_pod_inline( "$tag$odel $str $cdel" );
     },
-    
-    CodeBlock => sub {	# {{{2}}}
-        my( $elem ) = @_;
-        return _mk_pod_block( $elem->{c}[-1] ) if 'raw_pod' eq $elem->{c}[-2][1][0];  # text
-        $elem->{c}[-2] = [q{},[],[]];   # Delete attributes
+
+    CodeBlock => sub {    # {{{2}}}
+        my ( $elem ) = @_;
+        return _mk_pod_block( $elem->{c}[-1] )
+          if 'raw_pod' eq $elem->{c}[-2][1][0];    # text
+        $elem->{c}[-2] = [ q{}, [], [] ];          # Delete attributes
         return $elem;
     },
 
-    DefinitionList => sub {	# {{{2}}}
-        my( $elem ) = @_;
-        my $list = $elem->{c}; # [ [ [t,e,r,m], [ [d,e,f,1], ...] ], ... ]
-        my @new_list = ( OVER ); # init pod list
-        for my $item ( @$list ) {  # an array of arrays
-            my($term, $definitions) = @$item; # array of inlines, array of arrays
-            unshift @$term, ITEM;  # prepend pod command
-            push @new_list, _mk_elem_with_class( Div => [ _mk_elem( Para => $term ) ], 'dt' );  # wrap in para and div
-            for my $definition ( @$definitions ) {  # array of arrays of blocks
-                push @new_list, _mk_elem_with_class( Div => $definition, 'dd' ); # wrap ary of blocks
+    DefinitionList => sub {                        # {{{2}}}
+        my ( $elem ) = @_;
+        my $list     = $elem->{c};    # [ [ [t,e,r,m], [ [d,e,f,1], ...] ], ... ]
+        my @new_list = ( OVER );      # init pod list
+        for my $item ( @$list ) {     # an array of arrays
+            my ( $term, $definitions ) = @$item;  # array of inlines, array of arrays
+            unshift @$term, ITEM;                 # prepend pod command
+            push @new_list,
+              _mk_elem_with_class(
+                Div => [ _mk_elem( Para => $term ) ],
+                [qw[plain2pod dt]]
+              );                                  # wrap in para and div
+            for my $definition ( @$definitions ) {    # array of arrays of blocks
+                push @new_list,
+                  _mk_elem_with_class( Div => $definition, [qw[plain2pod dd]] )
+                  ;                                   # wrap ary of blocks
             }
-        }
-        push @new_list, BACK;  # close pod list
-        return _mk_elem_with_class( Div => \@new_list, 'dl' );  # return div to suppress writer formatting
+        } ## end for my $item ( @$list )
+        push @new_list, BACK;                         # close pod list
+        return _mk_elem_with_class( Div => \@new_list, [qw[plain2pod dl]] )
+          ;    # return div to suppress writer formatting
     },
 
-    BulletList => sub {	# {{{2}}}
-        my( $elem ) = @_;
-        my $list = $elem->{c};
+    BulletList => sub {    # {{{2}}}
+        my ( $elem ) = @_;
+        my $list     = $elem->{c};
         my @new_list = ( OVER );
-        for my $item ( @$list ) { # array of arrays of blocks
-            push @new_list, BULLET;  # =item *
-            push @new_list, _mk_elem_with_class( Div => $item, 'li' );
+        for my $item ( @$list ) {    # array of arrays of blocks
+            push @new_list, BULLET;    # =item *
+            push @new_list, _mk_elem_with_class( Div => $item, [qw[plain2pod li]] );
         }
         push @new_list, BACK;
-        return _mk_elem_with_class( Div => \@new_list, 'ul' );
+        return _mk_elem_with_class( Div => \@new_list, [qw[plain2pod ul]] );
     },
 
-    OrderedList => sub { 	# {{{2}}}
-        my( $elem ) = @_;
+    OrderedList => sub {               # {{{2}}}
+        my ( $elem ) = @_;
+
         # first number, number-style, delimiter-style
-        my($num, $style, $delim) = @{ $elem->{c}[0] };
+        my ( $num, $style, $delim ) = @{ $elem->{c}[0] };
+
         # { t => "Foo", c => [] } --> "Foo"
         for my $attr ( $style, $delim ) {
             $attr = $attr->{t};
         }
-        my $list = $elem->{c}[1];
+        my $list     = $elem->{c}[1];
         my @new_list = ( OVER );
-        for my $item ( @$list ) { # array of arrays of blocks
-            push @new_list, _mk_pod_block(
-                sprintf $list{delim}{$delim}, $list{style}{$style}->($num++)
-            );
-            push @new_list, _mk_elem_with_class( Div => $item, 'li' ); 
-        }
+        for my $item ( @$list ) {      # array of arrays of blocks
+            push @new_list,
+              _mk_pod_block( sprintf $list{delim}{$delim},
+                $list{style}{$style}->( $num++ ) );
+            push @new_list, _mk_elem_with_class( Div => $item, [qw[plain2pod li]] );
+        } ## end for my $item ( @$list )
         push @new_list, BACK;
-        return _mk_elem_with_class( Div => \@new_list, 'ol' );
+        return _mk_elem_with_class( Div => \@new_list, [qw[plain2pod ol]] );
+    },
+
+    Div => sub {                       # {{{2}}}
+        return unless $option->{preserve_divs};
+        my ( $elem ) = @_;
+        return if blessed $elem;
+        my $data = $elem->{c}[-1];
+        my $attr = $elem->{c}[-2];
+        my ( $id, $classes, $kvs ) = @$attr;
+
+        # return unless $id or scalar(@$classes) or scalar(@$kvs);
+        my @attrs;
+        push @attrs, qq{id="$id"}          if $id;
+        push @attrs, qq{class="@$classes"} if @$classes;
+        for my $kv ( @$kvs ) {
+            my ( $k, $v ) = @$kv;
+            $v =~ s/\\(.)|(")/\\$+/g;
+            push @attrs, qq{$k="$v"};
+        }
+        return unless @attrs;
+        my $text = "<div @attrs>";
+        my $start = _mk_pod_block("=for markdown\n$text");
+        my $end   = _mk_pod_block("=for markdown\n</div>");
+        rmap_hash { bless $_ => CLASS } $start, $end;
+        unshift @$data, $start;
+        push @$data, $end;
+        return $elem;
     },
 
 );
@@ -278,7 +338,7 @@ if( $option->{cut} ) {
       join "\n\n", (
         '=pod',
         '=encoding UTF-8',
-        "=for Info: POD generated by $0 and pandoc.",
+        "=for Info: POD generated by $SCRIPT and pandoc.",
       )
     );
     push @$body, _mk_pod_block('=cut' );
@@ -286,6 +346,7 @@ if( $option->{cut} ) {
 
 # loop through all hashes/elements recursively  # {{{1}}}
 rmap_hash {
+    return if blessed $_;
     return unless exists $_->{t}; # minimal checks for valid element
     return unless exists $_->{c};
     my $tag = $_->{t};
@@ -297,7 +358,7 @@ rmap_hash {
 } $doc;
 
 
-print {*STDOUT} encode_json $doc;
+print {*STDOUT} $JSON->encode( $doc );
 
 # FUNCTIONS                                     # {{{1}}}
 
@@ -398,7 +459,7 @@ sub _gen_emph {	# {{{2}}}
 		unshift @$contents, _mk_pod_inline(qq($x$odel ) );
 		push @$contents, _mk_pod_inline(qq( $cdel) );
         undef $Nested unless $orig_nested;
-		return _mk_elem_with_class( Span => $contents, lc $x );
+		return _mk_elem_with_class( Span => $contents, ['plain2pod', lc($x)] );
 	};
 }
 
