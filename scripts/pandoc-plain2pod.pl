@@ -83,8 +83,10 @@ BEGIN {
         return _mk_elem( Str => $text );
     }
 
+    my $break = _mk_elem( Str => "\n" );
     sub _mk_pod_block {	# {{{2}}}
-        return _mk_elem( Para => [ &_mk_pod_inline ] );
+        my $text = &_mk_pod_inline;
+        return _mk_elem( Para => [ $break, $text, $break ] );
     }
 
     sub _mk_elem_with_class {	# {{{2}}}
