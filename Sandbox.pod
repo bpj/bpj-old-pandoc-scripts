@@ -1,0 +1,11 @@
+=over
+
+=item foo
+
+Foo
+
+=item bar
+
+Bar
+
+=back
