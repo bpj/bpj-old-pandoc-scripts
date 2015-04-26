@@ -14,7 +14,9 @@ get more sophisticated highlighting and formatting of code, and you can
 highlight different pieces of code differently, e.g. based on code
 language.
 
-The code lives L<here|http://git.io/vfDpF>.
+View the L<code|http://git.io/vfDpF> 
+and the L<documentation|http://git.io/vfDj7>
+on GitHub.
 
 =for documentation: see after the code!
 
