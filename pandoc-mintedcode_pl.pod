@@ -212,6 +212,16 @@ and run I<*latex> on that!
 
 =head1 REQUIRED CPAN MODULES
 
+=over 4
+
+=item Data::Rmap
+
+=item JSON::MaybeXS
+
+=item List::AllUtils
+
+=back
+
 =head2 Installing modules
 
 L<http://www.cpan.org/modules/INSTALL.html>
