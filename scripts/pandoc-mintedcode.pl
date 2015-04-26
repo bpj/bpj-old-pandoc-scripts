@@ -428,11 +428,15 @@ and run I<< *latex >> on that!
 
 =head1 REQUIRED CPAN MODULES
 
+=over
+
 =item   Data::Rmap    
 
 =item   JSON::MaybeXS 
 
 =item   List::AllUtils
+
+=back
 
 =head2 Installing modules
 
