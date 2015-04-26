@@ -78,7 +78,7 @@ my $doc = $JSON->decode( do { local $/; <>; } );
 
 my $option = get_meta_opts(
     +{  doc     => $doc,        #
-        opts    => [qw[ block inline bsfx isfx pickup strip ]],    #
+        opts    => [qw[ block inline bsfx isfx class strip ]],    #
         default => +{ bsfx => 'code', isfx => 'inline' },         #
         prefix  => q{mint_},         #
     }
@@ -98,7 +98,7 @@ my %handler = (
             my $attrs = $elem->{c}[-2][2];
             my($mint) = firstval { 'mint' eq $_->[0] } @$attrs;
             $mint &&= $mint->[1];
-            $mint ||= ($option->{pickup} ? $elem->{c}[-2][1][0] : undef) 
+            $mint ||= ($option->{class} ? $elem->{c}[-2][1][0] : undef) 
                 || $option->{inline} || return;
             $mint .= $option->{isfx} if $option->{isfx};
             my $code = $elem->{c}[-1];
@@ -114,7 +114,7 @@ my %handler = (
             my $attrs = $elem->{c}[-2][2];
             my($mint) = grep { 'mint' eq $_->[0] } @$attrs;
             $mint &&= $mint->[1];
-            $mint ||= ($option->{pickup} ? $elem->{c}[-2][1][0] : undef) 
+            $mint ||= ($option->{class} ? $elem->{c}[-2][1][0] : undef) 
                 || $option->{block} || return;
             $mint .= $option->{bsfx} if $option->{bsfx};
             my $code = $elem->{c}[-1];
@@ -346,7 +346,7 @@ Then you can use this in your Markdown:
 
 This illustrates how the 'suffixes' for C<< \minted >> and
 C<< \mintinline >> shortcuts, viz. C<< code >> in
-C<< \begin{<language>code} >> and C<< \<language>inline >> are
+C<< \begin{<language>code} >> and C<< language >> in C<< \<language>inline >> are
 I<< always >> 'inferred by the filter, even when the C<< <value> >> in
 the C<< mint=<value> >> attribute isn't really the name of a code
 language, (or not I<< only >> the name of a language). However these
@@ -372,7 +372,7 @@ environment/command names in their entirety in your markdown.
 
 Provided the first class, if any, of your code blocks/inlines always is
 the language name -- for the benefit of Pandoc's builtin highlighter --
-you can set the metadata value C<< mint_pickup >> to a true (to Perl!)
+you can set the metadata value C<< mint_class >> to a true (to Perl!)
 value, and then you don't need to use the C<< mint=<language> >>
 attribute at all, provided Pygments's and Pandoc's notion of the
 language name coincide. Note that an explicit C<< mint=<language> >>
@@ -425,6 +425,22 @@ mechanism; you I<< have to >> first generate a standalone LaTeX document
 and run I<< *latex >> on that!
 
 =back
+
+=head1 REQUIRED CPAN MODULES
+
+=item   Data::Rmap    
+
+=item   JSON::MaybeXS 
+
+=item   List::AllUtils
+
+=head2 Installing modules
+
+L<http://www.cpan.org/modules/INSTALL.html>
+
+=head2 Installing I<perl>
+
+L<http://learn.perl.org/installing/>
 
 =cut
 
