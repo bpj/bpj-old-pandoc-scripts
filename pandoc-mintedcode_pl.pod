@@ -12,13 +12,7 @@ get more sophisticated highlighting and formatting of code, and you can
 highlight different pieces of code differently, e.g. based on code
 language.
 
-=over
-
-=item Link to code
-
-L<https://github.com/bpj/bpj-pandoc-scripts/blob/master/scripts/pandoc-mintedcode.pl>
-
-=back
+The code lives L<here|http://git.io/vfDpF>.
 
 =for documentation: see after the code!
 
