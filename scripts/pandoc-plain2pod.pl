@@ -36,7 +36,7 @@ use CLASS;
 use JSON::MaybeXS();
 use Data::Rmap qw[ rmap_hash rmap_array cut ]; # Data structure traversal support.
 use List::AllUtils qw[ max all any];
-use Scalar::Util qw[refaddr];
+use Scalar::Util qw[refaddr blessed];
 use File::Basename qw[ basename ];
 use Roman;
 use Number::Latin;
