@@ -22,7 +22,7 @@ my $cwd;
 BEGIN { $cwd = cwd }
 END { chdir $cwd }
 
-use subs qw[ dir2pdf ];
+use subs qw[ dir2target ];
 
 my %opt = (    #
     input_dir        => undef,       #
@@ -84,12 +84,12 @@ for my $key ( qw[ exclude_matching copy_matching ] ) {
 
 chdir $opt{input_dir};
 
-dir2pdf( $opt{input_dir} );
+dir2target( $opt{input_dir} );
 
-sub dir2pdf {
+sub dir2target {
     my ( $sourcedir ) = @_;
     $sourcedir = path( $sourcedir );
-    die "Usage: dir2pdf(\$dirpath)\n" unless $sourcedir->is_dir;
+    die "Usage: dir2target(\$dirpath)\n" unless $sourcedir->is_dir;
   LOOP:
     for my $source ( $sourcedir->children ) {
         if ( $opt{exclude_matching} and $source =~ $opt{exclude_matching} ) {
@@ -97,7 +97,7 @@ sub dir2pdf {
             next LOOP;
         }
         if ( $source->is_dir ) {
-            dir2pdf( $source );
+            dir2target( $source );
         }
         elsif ( $source->is_file ) {
             my $rootname = $source->basename( $ext_re );
@@ -121,7 +121,7 @@ sub dir2pdf {
                 } ## end if ( $opt{titles} )
                 if ( $opt{read_css} ) {
                     my $css_file = $source->sibling( "$rootname.css" );
-                    if ( -e $css_file and !-d $css_file ) {
+                    if ( $css_file->is_file ) {
                         my $css = $css_file->slurp_utf8;
                         push @args, ( -M => "include_css=$css" ) if length $css;
                     }
@@ -129,7 +129,7 @@ sub dir2pdf {
                 if ( $opt{include_yaml} ) {
                     my $yaml
                       = $source->sibling( $rootname . '.yaml' );
-                    push @args, ( $yaml ) if -e $yaml and !-d $yaml;
+                    push @args, ( $yaml ) if $yaml->is_file;
                 }
                 my $stderr = capture_stderr {
                     system { $opt{pandoc} } pandoc => @ARGV,
@@ -144,7 +144,7 @@ sub dir2pdf {
             }
         } ## end elsif ( $source->is_file )
     } ## end LOOP: for my $source ( $sourcedir...)
-} ## end sub dir2pdf
+} ## end sub dir2target
 
 sub fix_wikilinks {
     state $tmpdir = tempdir( CLEANUP => 1 );
@@ -286,6 +286,36 @@ overriding it.
     :   perl batch-pandoc.pl -i myproject.wiki -t pdf -W -r markdown_github
 
 :   will create a directory `myproject.wiki-pdf` containing the wiki pages in PDF format.
+
+**--titles**_[=0|1]_
+
+:    If the argument is true (!=0) or missing a title will be constructed from the input filename by removing the `--from-extension`, replacing hyphens with spaces and capitalizing the first word, and included in the pandoc arguments as `-M title=TITLE`.
+    This option is useful when converting a cloned GitHub wiki but should not be used when the source files contain their own title information e.g. as Pandoc metadata or as HTML `<title>` elements.
+
+**-C** _[0|1]_, **--include-css**_[=0|1]_
+
+:    If the argument is true (!=0) or missing and there is a sibling file with the same basename as the source file but a `.css` extension that file will be copied and linked by including `--css=FILENAME` in the pandoc argument list.
+
+**-Y** _[0|1]_, **--include-yaml**_[=0|1]_
+
+:    If the argument is true (!=0) or missing and there is a sibling file with the same basename as the source file but a `.yaml` extension that file will be included as an input file on the pandoc argument list. This is useful if you want to make metadata accessible to external tools by keeping them in a separate file. To work as a pandoc metadata block the file has to begin and end with the `---` and `...` delimiters.
+
+    On the other hand you can copy YAML metadata from markdown files to external files by saving a file `yaml.markdown` with the contents
+
+    ````pandoc-template
+    $if(titleblock)$
+    $titleblock$
+    $else$
+    --- {}
+    $endif$
+    ````
+    
+    and then run with the commandline
+    
+    ````shell
+    $ perl batch-pandoc.pl -i sourcedir -o sourcedir -f .md -t .yaml \
+    -w markdown --template=yaml.markdown
+    ````
 
 **-P** _path/to/pandoc_, **--pandoc**=_path/to/pandoc_
 
