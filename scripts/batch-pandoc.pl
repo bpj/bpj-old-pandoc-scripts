@@ -52,7 +52,7 @@ C<< .html >> file which has been converted with pandoc.
 Any commandline argument which is not recognised as a batch-pandoc.pl
 option is passed on to pandoc, so that if you for example want to use a
 certain pandoc template in the conversion you can just add the pandoc
-option C<< -- template=mytemplate.html >> to your commandline.
+option C<< --template=mytemplate.html >> to your commandline.
 
 This script doesn't try to be smarter than that. If you for example want
 to include a navigation bar or document-specific CSS you will have to
@@ -236,45 +236,42 @@ end of the pandoc commandline, overriding it.
 
 =over
 
-=item B<< -i >> I<< path/to/dir >>,
-B<< --input-dir >>=I<< path/to/dir >>
+=item C<< -i >> I<< path/to/dir >>, C<< --input-dir >>=I<< path/to/dir >>
 
 (Required)
 
 The directory containing the input files. This option has no default,
 and thus it is an error to omit it.
 
-=item B<< -o >> I<< path/to/dir >>,
-B<< --output-dir >>=I<< path/to/dir >>
+=item C<< -o >> I<< path/to/dir >>, C<< --output-dir >>=I<< path/to/dir >>
 
 The directory below which to put the output files. If omitted a sibling
-to B<< --input-dir >> with C<< -TO-EXTENSION >> appended will be used.
+to C<< --input-dir >> with C<< -TO-EXTENSION >> appended will be used.
 This directory and its descendant directories will be created as needed.
 
-=item B<< -f >> I<< .ext >>, B<< --from-extension >>=I<< .ext >>
+=item C<< -f >> I<< .ext >>, C<< --from-extension >>=I<< .ext >>
 
 (Default: C<< .md >>)
 
 The file extension for input files. The leading dot will be added if
 missing.
 
-=item B<< -t >> I<< .ext >>, B<< --to-extension >>=I<< .ext >>
+=item C<< -t >> I<< .ext >>, C<< --to-extension >>=I<< .ext >>
 
 (Default: C<< .html >>)
 
 The file extension for output files. The leading dot will be added if
 missing.
 
-=item B<< -c >> I<< regex >>, B<< --copy-matching >>=I<< regex >>
+=item C<< -c >> I<< regex >>, C<< --copy-matching >>=I<< regex >>
 
-A Perl regular expression. If supplied any files below B<< --input-
-dir >> with a name matching it will be copied to the corresponding
-position below B<< --output-dir >>. Typically it should match one or
-more file extensions and anchor to the end-of- string, e.g.
+A Perl regular expression. If supplied any files below C<< --input-dir >>
+with a name matching the regex will be copied to the corresponding
+position below C<< --output-dir >>. Typically it should match one or
+more file extensions and anchor to the end-of-string, e.g.
 C<< \.(?:jpe?g|png|gif)\z >>.
 
-=item B<< -W >> [I<< sprintf-format >>],
-B<< --wikilinks >>[=I<< sprintf-format >>]
+=item C<< -W >> [I<< sprintf-format >>], C<< --wikilinks >>[=I<< sprintf-format >>]
 
 If present, with or without an argument any input file containing
 wikilinks of the form C<< [[LINK TEXT|WIKILINK]] >> or
@@ -283,24 +280,24 @@ substituted by the return value of
 C<< sprintf($sprintf_format, $linktext, $wikilink) >>, and the temporary
 file will be used as input file instead of the original.
 
-The sprintf-format defaults to C<< "[%s](%s.$to_extension")" >> and the
+The sprintf-format defaults to C<< "[%s](%s.$to_extension)" >> and the
 link text defaults to the wikilink text. The wikilink text will have any
 whitespace replaced with hyphens. Thus a wikilink like
 C<< [[normal usage]] >> will become
 C<< [normal usage](normal-usage.html) >> and a wikilink like
 C<< [[when used normally|normal usage]] >> will become
-C<< [when used normally](normal- usage.html) >> with the defaults.
+C<< [when used normally](normal-usage.html) >> with the defaults.
 
-This option is useful for example if you have cloned a L<< GitHub
-wiki|https://help.github.com/articles/about-github-wikis/ >> and want to
-convert it to some other format:
+This option is useful for example if you have cloned a
+L<< GitHub wiki|https://help.github.com/articles/about-github-wikis/ >>
+and want to convert it to some other format:
 
-: perl batch-pandoc.pl -i myproject.wiki -t pdf -W -r markdown_github
+    perl batch-pandoc.pl -i myproject.wiki -t pdf -W -r markdown_github
 
 will create a directory C<< myproject.wiki-pdf >> containing the wiki
 pages in PDF format.
 
-=item B<< --titles >>I<< [=0|1] >>
+=item C<< --titles >>I<< [=0|1] >>
 
 If the argument is true (!=0) or missing a title will be constructed
 from the input filename by removing the C<< --from-extension >>,
@@ -310,14 +307,14 @@ is useful when converting a cloned GitHub wiki but should not be used
 when the source files contain their own title information e.g. as Pandoc
 metadata or as HTML C<< <title> >> elements.
 
-=item B<< -C >> I<< [0|1] >>, B<< --include-css >>I<< [=0|1] >>
+=item C<< -C >> I<< [0|1] >>, C<< --include-css >>I<< [=0|1] >>
 
 If the argument is true (!=0) or missing and there is a sibling file
 with the same basename as the source file but a C<< .css >> extension
 that file will be copied and linked by including C<< --css=FILENAME >>
 in the pandoc argument list.
 
-=item B<< -Y >> I<< [0|1] >>, B<< --include-yaml >>I<< [=0|1] >>
+=item C<< -Y >> I<< [0|1] >>, C<< --include-yaml >>I<< [=0|1] >>
 
 If the argument is true (!=0) or missing and there is a sibling file
 with the same basename as the source file but a C<< .yaml >> extension
@@ -341,8 +338,7 @@ and then run with the commandline
     $ perl batch-pandoc.pl -i sourcedir -o sourcedir -f .md -t .yaml \
     -w markdown --template=yaml.markdown
 
-=item B<< -P >> I<< path/to/pandoc >>,
-B<< --pandoc >>=I<< path/to/pandoc >>
+=item C<< -P >> I<< path/to/pandoc >>, C<< --pandoc >>=I<< path/to/pandoc >>
 
 (Default: C<< pandoc >>)
 
