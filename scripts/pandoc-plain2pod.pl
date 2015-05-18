@@ -41,6 +41,8 @@ use File::Basename qw[ basename ];
 use Roman;
 use Number::Latin;
 
+use constant DEBUG => $ENV{DEBUG_PANDOC_PLAIN2POD} || 0;
+
 my $to_format = shift @ARGV;
 
 # die "$0 requires 'plain' as --to format" unless 'plain' eq $to_format;
@@ -175,10 +177,17 @@ my %handler_for = (
              # and my pandoc-pod2md script and Pod::Markdown subclass
              # will do the right thing with zero URLs
              # when generating markdown from pod!
-        if ( $title =~ s{ \A (?: perldoc|cpan|pod|man ) : }{}x ) {
+        if ( $url =~ m{ \A (?: perldoc|cpan|pod|man ) : ( .+ ) }x ) {
+            my $page = $1;
+            $title = $title =~ s!^/!! ? $url . qq{/"$title"} : $url ;
+            $url = $page;
+            @$text = ( _mk_elem( Str => $page ) ) unless @$text;
+            $url = '|' . $url if @$text;
+        }
+        elsif ( $title =~ s{ \A (?: perldoc|cpan|pod|man ) : }{}x ) {
 
             # if there is a text there should be a pipe before the url
-            $url = @$text ? "|$title" : $title;
+            $url = @$text ? '|' . $title : $title;
         }
         else { $url = @$text ? '|' . $url : $url . '|' . $url }
 
