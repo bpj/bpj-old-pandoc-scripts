@@ -1,0 +1,17 @@
+=pod
+
+=encoding UTF-8
+
+This is the documentation for L<< pandoc-plain2email.pl || http://git.io/vLXw8 >>.
+
+=head1 DESCRIPTION
+
+No documentation yet!
+
+TODO!
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

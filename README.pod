@@ -1,0 +1,88 @@
+=head1 batch-pandoc.pl
+
+batch-pandoc.pl is a perl script to batch-convert files with a certain
+extension in a directory and its descendants with pandoc, creating a
+mirror directory structure with converted files.
+
+
+
+=head1 pandoc-class2latex.pl
+
+Documentation for pandoc-class2latex.pl still to be written
+
+=head1 pandoc-code2raw.pl
+
+Documentation for pandoc-code2raw.pl still to be written
+
+=head1 pandoc-dl2ul.pl
+
+No documentation yet!
+
+
+
+=head1 pandoc-extract-noattr-div-span.pl
+
+Documentation for pandoc-extract-noattr-div-span.pl still to be written
+
+=head1 pandoc-keep-div.pl
+
+Documentation for pandoc-keep-div.pl still to be written
+
+=head1 pandoc-list-checkbox.pl
+
+Documentation for pandoc-list-checkbox.pl still to be written
+
+=head1 pandoc-local-quotes.pl
+
+Documentation for pandoc-local-quotes.pl still to be written
+
+=head1 pandoc-mintedcode.pl
+
+This is a quick and dirty L<<< I<< pandoc >>|http://pandoc.org >>>
+filter which allows you to highlight code in LaTeX output with
+L<<< I<< minted >>|https://www.ctan.org/pkg/minted >>> 2.0 rather than
+with Pandoc's builtin highlighting mechanism. This is useful because you
+get more sophisticated highlighting and formatting of code, and you can
+highlight different pieces of code differently, e.g. based on code
+language.
+
+
+
+=head1 pandoc-no-header-links.pl
+
+Documentation for pandoc-no-header-links.pl still to be written
+
+=head1 pandoc-no-header-span-ids.pl
+
+Documentation for pandoc-no-header-span-ids.pl still to be written
+
+=head1 pandoc-plain2email.pl
+
+No documentation yet!
+
+
+
+=head1 pandoc-plain2pod.pl
+
+pandoc-plain2pod.pl is a pandoc filter to munge plain output into Perl
+POD documentation, a poor man's custom writer implemented as a filter if
+you will.
+
+
+
+=head1 pandoc-span2cmd.pl
+
+Documentation for pandoc-span2cmd.pl still to be written
+
+=head1 pandoc-texlogo.pl
+
+pandoc-texlogo.pl is a L<< pandoc|http://pandoc.org/ >> filter to help
+display the logos for TeX, LaTeX etc. correctly in in LaTeX (including
+when generating PDF!) and ConTeXt output while also rendering them
+sensibly in other formats.
+
+
+
+=head1 pandoc-zap-images.pl
+
+Documentation for pandoc-zap-images.pl still to be written
