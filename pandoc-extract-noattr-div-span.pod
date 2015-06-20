@@ -1,0 +1,2 @@
+This is the documentation for L<< pandoc-extract-noattr-div-span.pl || http://git.io/vLXwG >>.
+
