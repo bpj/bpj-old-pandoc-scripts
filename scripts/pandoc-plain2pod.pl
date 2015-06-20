@@ -40,6 +40,8 @@ use Scalar::Util qw[refaddr blessed];
 use File::Basename qw[ basename ];
 use Roman;
 use Number::Latin;
+use URI::Escape qw[ uri_unescape ];
+use Encode qw[ decode_utf8 ];
 
 use constant DEBUG => $ENV{DEBUG_PANDOC_PLAIN2POD} || 0;
 
@@ -177,10 +179,9 @@ my %handler_for = (
              # and my pandoc-pod2md script and Pod::Markdown subclass
              # will do the right thing with zero URLs
              # when generating markdown from pod!
-        if ( $url =~ m{ \A (?: perldoc|cpan|pod|man ) : ( .+ ) }x ) {
-            my $page = $1;
-            $title = $title =~ s!^/!! ? $url . qq{/"$title"} : $url ;
-            $url = $page;
+        if ( $url =~ m{ \A (?: perldoc|cpan|pod|man ) : ( [^/]* ) (?: / " (.+) " )? }x ) {
+            my $page = decode_utf8 uri_unescape($+);
+            $url = decode_utf8 uri_unescape($url);
             @$text = ( _mk_elem( Str => $page ) ) unless @$text;
             $url = '|' . $url if @$text;
         }
