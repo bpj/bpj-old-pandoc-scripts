@@ -107,6 +107,15 @@ you will.
 
 Documentation for pandoc-span2cmd.pl still to be written!
 
+=head3 pandoc-tabularize.pl
+
+C<< pandoc-tabularize.pl >> is a pandoc filter to use the C<< tabular >>
+environment instead of the C<< longtable >> package in LaTeX output.
+This is especially useful if you want to use C<< twocolumn >> mode,
+which doesn't work with C<< longtable >>.
+
+
+
 =head3 pandoc-texlogo.pl
 
 pandoc-texlogo.pl is a L<< pandoc|http://pandoc.org/ >> filter to help
