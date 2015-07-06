@@ -1,2 +1,2 @@
-This is the documentation for L<< pandoc-no-header-links.pl || http://git.io/vLXwW >>.
+This is the documentation for L<< pandoc-no-header-links.pl | http://git.io/vLXwW >>.
 

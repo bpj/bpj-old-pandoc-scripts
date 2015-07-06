@@ -1,2 +1,2 @@
-This is the documentation for L<< pandoc-class2latex.pl || http://git.io/vLXVx >>.
+This is the documentation for L<< pandoc-class2latex.pl | http://git.io/vLXVx >>.
 

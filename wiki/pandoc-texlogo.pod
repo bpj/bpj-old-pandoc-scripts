@@ -2,7 +2,7 @@
 
 =encoding UTF-8
 
-This is the documentation for L<< pandoc-texlogo.pl || http://git.io/vLXwR >>.
+This is the documentation for L<< pandoc-texlogo.pl | http://git.io/vLXwR >>.
 
 =head1 NAME
 

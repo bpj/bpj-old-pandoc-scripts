@@ -1,2 +1,2 @@
-This is the documentation for L<< pandoc-keep-div.pl || http://git.io/vLXwZ >>.
+This is the documentation for L<< pandoc-keep-div.pl | http://git.io/vLXwZ >>.
 

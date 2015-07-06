@@ -1,6 +1,6 @@
 =encoding UTF-8
 
-This is the documentation for L<< pandoc-tabularize.pl || http://git.io/vqWWd >>.
+This is the documentation for L<< pandoc-tabularize.pl | http://git.io/vqWWd >>.
 
 =head1 NAME
 
