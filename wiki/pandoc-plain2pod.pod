@@ -2,7 +2,7 @@
 
 =encoding UTF-8
 
-This is the documentation for L<< pandoc-plain2pod.pl | http://git.io/vLXw4 >>.
+This is the documentation for L<< pandoc-plain2pod.pl|http://git.io/vLXw4 >>.
 
 =head1 NAME
 

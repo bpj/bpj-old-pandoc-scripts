@@ -2,7 +2,7 @@
 
 =encoding UTF-8
 
-This is the documentation for L<< pandoc-span2cmd.pl | http://git.io/vLXwB >>.
+This is the documentation for L<< pandoc-span2cmd.pl|http://git.io/vLXwB >>.
 
 =head1 # NAME
 

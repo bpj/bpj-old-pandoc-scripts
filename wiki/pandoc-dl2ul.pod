@@ -2,7 +2,7 @@
 
 =encoding UTF-8
 
-This is the documentation for L<< pandoc-dl2ul.pl | http://git.io/vLXws >>.
+This is the documentation for L<< pandoc-dl2ul.pl|http://git.io/vLXws >>.
 
 =head1 DESCRIPTION
 

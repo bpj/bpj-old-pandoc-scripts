@@ -1,2 +1,2 @@
-This is the documentation for L<< pandoc-local-quotes.pl | http://git.io/vLXwc >>.
+This is the documentation for L<< pandoc-local-quotes.pl|http://git.io/vLXwc >>.
 

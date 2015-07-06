@@ -1,2 +1,2 @@
-This is the documentation for L<< pandoc-zap-images.pl | http://git.io/vLXw0 >>.
+This is the documentation for L<< pandoc-zap-images.pl|http://git.io/vLXw0 >>.
 

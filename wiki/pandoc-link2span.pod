@@ -1,6 +1,6 @@
 =encoding UTF-8
 
-This is the documentation for L<< pandoc-link2span.pl | http://git.io/vLXX1 >>.
+This is the documentation for L<< pandoc-link2span.pl|http://git.io/vLXX1 >>.
 
 =head1 NAME
 
