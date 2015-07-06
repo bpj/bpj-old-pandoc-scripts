@@ -55,7 +55,7 @@ for my $perl ( sort grep { m!\Ascripts/! and /\.pl\z/ and $_->is_file } map { pa
     $repo->run( add => $perl );
     next DOC unless !$pod->is_file or $perl->stat->mtime > $pod->stat->mtime;
     my $short_url = makeashorterlink($url . "/$name");
-    my($link) = node->from_pod( qq!This is the documentation for L<< $name | $short_url >>.\n\n! );
+    my($link) = node->from_pod( qq!This is the documentation for L<< $name|$short_url >>.\n\n! );
     if (my($h1) = $pa->select('/head1(0)') ) {
         $link->insert_before($h1);
     }
