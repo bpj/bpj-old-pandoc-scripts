@@ -111,7 +111,7 @@ my $to_format = shift @ARGV;
 
 my $json = do { local $/; <>; };
 
-List of supported formats
+# List of supported formats
 print $json and exit 0 if none { $_ eq $to_format }  qw[ latex ];
 
 my $JSON = JSON::MaybeXS->new( utf8 => 1 );
