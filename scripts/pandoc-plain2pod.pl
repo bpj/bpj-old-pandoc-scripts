@@ -169,28 +169,30 @@ my %handler_for = (
         my $text  = $elem->{c}[0];       # link text: an array of inlines
         my $url   = $elem->{c}[1][0];    # url: a string
         my $title = $elem->{c}[1][1];    # title: a string
-             # we don't bother translating CPAN/man links into pod/perldoc links;
-             # instead the author should provide the correct pod link string
-             # in the link title with a perldoc:|cpan:|pod:|man: prefix,
-             # and the url will be replaced with the rest of the title,
-             # prepending a pipe if the text is not empty.
-             # If the text is empty a link like
-             # [](0 "cpan:Some::Mod") will do the right thing,
-             # and my pandoc-pod2md script and Pod::Markdown subclass
-             # will do the right thing with zero URLs
-             # when generating markdown from pod!
-        if ( $url =~ m{ \A (?: perldoc|cpan|pod|man ) : ( [^/]* ) (?: / " (.+) " )? }x ) {
-            my $page = decode_utf8 uri_unescape($+);
-            $url = decode_utf8 uri_unescape($url);
-            @$text = ( _mk_elem( Str => $page ) ) unless @$text;
-            $url = '|' . $url if @$text;
-        }
-        elsif ( $title =~ s{ \A (?: perldoc|cpan|pod|man ) : }{}x ) {
+             # # we don't bother translating CPAN/man links into pod/perldoc links;
+             # # instead the author should provide the correct pod link string
+             # # in the link title with a perldoc:|cpan:|pod:|man: prefix,
+             # # and the url will be replaced with the rest of the title,
+             # # prepending a pipe if the text is not empty.
+             # # If the text is empty a link like
+             # # [](0 "cpan:Some::Mod") will do the right thing,
+             # # and my pandoc-pod2md script and Pod::Markdown subclass
+             # # will do the right thing with zero URLs
+             # # when generating markdown from pod!
+        # if ( $url =~ m{ \A (?: perldoc|cpan|pod|man ) : ( [^/]* ) (?: / " (.+) " )? }x ) {
+            # my $page = decode_utf8 uri_unescape($+);
+            # $url = decode_utf8 uri_unescape($url);
+            # @$text = ( _mk_elem( Str => $page ) ) unless @$text;
+            # $url = '|' . $url if @$text;
+        # }
+        # elsif ( $title =~ s{ \A (?: perldoc|cpan|pod|man ) : }{}x ) {
 
-            # if there is a text there should be a pipe before the url
-            $url = @$text ? '|' . $title : $title;
-        }
-        else { $url = @$text ? '|' . $url : $url . '|' . $url }
+            # # if there is a text there should be a pipe before the url
+            # $url = @$text ? '|' . $title : $title;
+        # }
+        # else { $url = @$text ? '|' . $url : $url . '|' . $url }
+
+        $url = @$text ? '|' . $url : $url ;
 
         # add a formatting code nesting level for the link,
         # making a minimum of two.
