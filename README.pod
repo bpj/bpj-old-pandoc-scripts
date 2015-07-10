@@ -36,6 +36,10 @@ mirror directory structure with converted files.
 
 
 
+=head3 pandoc-base64-img2file.pl
+
+Documentation for pandoc-base64-img2file.pl still to be written!
+
 =head3 pandoc-class2latex.pl
 
 Documentation for pandoc-class2latex.pl still to be written!
@@ -88,6 +92,10 @@ Documentation for pandoc-no-header-links.pl still to be written!
 =head3 pandoc-no-header-span-ids.pl
 
 Documentation for pandoc-no-header-span-ids.pl still to be written!
+
+=head3 pandoc-number-blocks.pl
+
+Documentation for pandoc-number-blocks.pl still to be written!
 
 =head3 pandoc-plain2email.pl
 

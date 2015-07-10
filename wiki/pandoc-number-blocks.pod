@@ -1,0 +1,93 @@
+This is the documentation for L<< pandoc-number-blocks.pl|http://git.io/vqdfl >>.
+
+=head1 DESCRIPTION
+
+ A [pandoc][] filter written in Perl for numbering paragraphs and other top level 
+ blocks sequentially throughout a document by injecting raw HTML or LaTeX code.
+
+ <https://groups.google.com/forum/#!msg/pandoc-discuss/aR0Fa2bKXZ8/vf4UbN8rcmsJ>
+
+ For paragraphs it inserts the sequential number a raw span in HTML
+ and a raw command in LaTeX at the beginning of the paragraph.
+ Other blocks, like lists, are wrapped in a div with a raw div/command
+ containing the sequential number as first content.
+ Divs are not numbered unless they have a class `number_me`.
+ OTOH the inserted divs around non-paragraph blocks get the same class,
+ and additionally a class corresponding to the Pandoc element type
+ of the contained block, in case you need to style it or the sequential 
+ number it contains specially.
+
+ The inserted raw markup looks as follows, where NUM is the sequential
+ number of the paragraph/block -- actually a string of digits --
+ and STRINGLEN is the width in characters of NUM -- actually a digit
+ (more on that below!)
+
+    html:
+        Div:  <div class="blockNum blockNumLenSTRINGLEN">NUM</div>
+        Para: <span class="paraNum blockNumLenSTRINGLEN">NUM</span>
+    latex:
+        Div:  \blockNum{NUM}
+        Para: \paraNum{NUM}
+
+
+ You will have to define CSS for these elements , and/or define the custom
+ LaTeX commands with `\newcommand` in their respective files and include 
+ those files with pandoc's `--css` or `--include-in-header` options.
+
+ I defined the LaTeX commands as follows:
+ 
+     \usepackage{marginnote}
+     % positive dimension moves down!
+     \newcommand{\blockNum}[1]{\marginnote{{\tiny #1}}[2\parskip]}
+     \newcommand{\paraNum}[1]{\marginnote{{\tiny #1}}[0.25\baselineskip]}
+ 
+ The reason I use the `marginnote` package rather than `marginpar`
+ is that it doesn't use floats, so that there is no risk to run
+ out of float memory.
+ 
+ Unfortunately the CSS styling has its problems, so it is more complicated:
+ 
+    body { padding-left: 6em; padding-right: 5em; }
+    span.paraNum, div.blockNum { /* NB negative margin! */
+        font-size: xx-small;
+        position: relative; 
+        left: -5em;
+    }
+    /* Remove unwanted indent */
+    .paraNumLen1, .blockNumLen1 {
+        margin-left: -0.75em; 
+    }
+    .paraNumLen2, .blockNumLen2 {
+        margin-left: -1.5em; 
+    }
+    /* Vertical adjustment */
+    div.blockNum {
+        /* top: 1em; */
+        margin-bottom: -3em;
+    }
+
+ The positioned span leaves behind an indent at the beginning of
+ the paragraph which must be compensated for with a negative left
+ margin, and the amount of negative margin must be adjusted to the
+ width of the span contents. On the flip side all ASCII digits are
+ the same width even in most proportional fonts, so the amount of
+ negative margin needed is proportional to the number of digits in
+ the block index number. Therefore I have inserted an extra class
+ `paraNumLenSTRINGLEN`, where `STRINGLEN` is the length of the
+ block index number in characters, so you can style the spans
+ separately based on them.
+ 
+ The divs numbering the non-paragraph blocks needs vertical adjustment,
+ sometimes differently for different block types. You can achieve that
+ with CSS like:
+ 
+     div.CodeBlock:first-child { margin-bottom: -3.5em }
+ 
+ Its LaTeX counterpart would also need vertical adjustment but I
+ haven't got that to actually work. At least you can make the
+ number `\tiny` to minimalize the effect.
+ 
+ What's worse a `\marginnote` right before a `\paragraph` pulls the
+ `\paragraph` with it into the margin. The workaround seems to be to only
+ use three header levels! :-(
+
