@@ -54,7 +54,7 @@ for my $perl ( sort grep { m!\Ascripts/! and /\.pl\z/ and $_->is_file } map { pa
     my $perl_mtime = $perl->stat->mtime;
     my $name = $perl->basename;
     my $base = $perl->basename('.pl');
-    push @wiki_index, "- [[$base]]";
+    push @wiki_index, "- [[$name|$base]]";
     my $pod = $wiki_dir->child( $base . '.pod' );
     my $fh = $perl->openr_utf8;
     my $pa = Pod::Abstract->load_filehandle($fh);
