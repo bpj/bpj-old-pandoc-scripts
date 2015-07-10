@@ -24,7 +24,7 @@ in a comment block at the head of the `scripts/*.pl` files themselves.)
 The order is strictly ASCIIbetical, so no discrimination is made
 between filters and other scripts. There should also be copies of
 the Pod documentation for each script
-L<< in the repository wiki | http://git.io/vJXPl >>.
+L<< in the repository wiki|http://git.io/vJXPl >>.
 Both the list and the documentation on
 the wiki should generally be updated as I make changes.
 
