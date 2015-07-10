@@ -14,7 +14,9 @@
 Pandoc filter which intercepts image elements with data URIs
 with Base64 encoded image data, decodes the data and writes
 the image to a file with a hopefully correct extension in a
-directory designated by the user as a metadata value.
+directory designated by the user as a metadata value,
+then replaces the URL in the output document with
+the path to that file.
 
 image_dir defaults to ./decoded_images
 
