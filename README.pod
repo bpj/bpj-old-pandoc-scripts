@@ -38,7 +38,12 @@ mirror directory structure with converted files.
 
 =head3 pandoc-base64-img2file.pl
 
-Documentation for pandoc-base64-img2file.pl still to be written!
+Pandoc filter which intercepts image elements with data URIs
+with Base64 encoded image data, decodes the data and writes
+the image to a file with a hopefully correct extension in a
+directory designated by the user as a metadata value.
+
+
 
 =head3 pandoc-class2latex.pl
 

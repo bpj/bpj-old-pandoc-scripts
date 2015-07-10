@@ -2,16 +2,19 @@
 
 =pod
 
-Pandoc filter which intercepts image elements with data URIs
-with Base64 encoded image data, decodes the data and writes
-the image to a file with a hopefully correct extension in a
-directory designated by the user as a metadata value.
-
-Usage:
+=head1 SYNOPSIS
 
     pandoc -F pandoc-base64-img2file.pl \
           [-M image_dir=decoded_images] \
           -f html some.html -t FORMAT -o FILE
+
+=head1 DESCRIPTION
+
+
+Pandoc filter which intercepts image elements with data URIs
+with Base64 encoded image data, decodes the data and writes
+the image to a file with a hopefully correct extension in a
+directory designated by the user as a metadata value.
 
 image_dir defaults to ./decoded_images
 
@@ -20,9 +23,24 @@ where "0000" is incremented for each data URI encountered
 and "EXT" actually is whatever comes after "image/" in the
 MIME type of the data URI.
 
-IMPORTANT: You must make sure that there is no whitespace in
+=head1 IMPORTANT
+
+You must make sure that there is no whitespace in
 the data URIs in the source, and thus that each is all on
 one line, or pandoc will become confused.
+
+Images files are overwritten with each run.
+Switch image directory or rename the old directory
+if that is a problem.
+
+=head1 PREREQUISITES
+
+    Data::Rmap
+    Data::Util
+    JSON::MaybeXS
+    List::AllUtils~0.09
+    MIME::Base64::Perl
+    Path::Tiny~0.011
 
 =cut
 
@@ -89,13 +107,14 @@ print $filter_doc->as_json;
 {
 
     package _Text::Pandoc::FilterUtils;
+
     use Carp;
-    use JSON::MaybeXS;
     use Data::Rmap qw[ rmap_hash rmap_array cut ];    # Data structure traversal support.
+    use Data::Util qw[ :check instance install_subroutine ];
     use Encode qw[ encode_utf8 is_utf8 ];
+    use JSON::MaybeXS;
     use List::AllUtils 0.09 qw[ all none pairs ];
     use Scalar::Util qw[ refaddr blessed ];
-    use Data::Util qw[ :check instance install_subroutine ];
 
     # CONSTANTS                                     # {{{1}}}
 
