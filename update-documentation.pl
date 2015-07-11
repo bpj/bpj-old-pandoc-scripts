@@ -25,8 +25,14 @@ use Pod::Abstract;
 use Pod::Abstract::BuildNode qw[ node ];
 use Pod::Abstract::Filter::cut;
 use WWW::Shorten 'GitHub';
+use Time::Moment;
+## Using run() instead of system():
+    use IPC::Run qw( run timeout );
 
-GetOptionsFromArray( \@ARGV, 'force|f' => \my $force ) or die "Bad options";
+GetOptionsFromArray(
+    \@ARGV, 
+    'force|f' => \my $force,
+) or die "Bad options";
  
 my $url = 'https://github.com/bpj/bpj-pandoc-scripts/blob/master/scripts/';
 
@@ -46,15 +52,18 @@ my $wiki_home       = $wiki_dir->child( 'Home.md' );
 my $readme_mtime    = $readme->is_file ? $readme->stat->mtime : 0;
 my $wiki_home_mtime = $wiki_home->is_file ? $wiki_home->stat->mtime : 0;
 
-my(@summaries, @wiki_index, );
+my(@summaries, );
+my @wiki_index = ( "|\n|:---|:---|:---|:---|" );
 my $update_readme = my $update_wiki = $force;
 
 DOC:
 for my $perl ( sort grep { m!\Ascripts/! and /\.pl\z/ and $_->is_file } map { path $_ } $repo->run( 'ls-files' ) ) {
     my $perl_mtime = $perl->stat->mtime;
+    my $perl_date = Time::Moment->from_epoch($perl_mtime)->at_utc->strftime('%F');
     my $name = $perl->basename;
     my $base = $perl->basename('.pl');
-    push @wiki_index, "- [[$name|$base]]";
+    my $short_url = makeashorterlink($url . "/$name");
+    push @wiki_index, "| `$name` | \[\[doc|$base\]\] | [code]($short_url) | $perl_date |";
     my $pod = $wiki_dir->child( $base . '.pod' );
     my $fh = $perl->openr_utf8;
     my $pa = Pod::Abstract->load_filehandle($fh);
@@ -69,7 +78,6 @@ for my $perl ( sort grep { m!\Ascripts/! and /\.pl\z/ and $_->is_file } map { pa
         or $perl_mtime > $pod->stat->mtime
         ;
     $repo->run( add => $perl );
-    my $short_url = makeashorterlink($url . "/$name");
     my($link) = node->from_pod( qq!This is the documentation for L<< $name|$short_url >>.\n\n! );
     if (my($h1) = $pa->select('/head1(0)') ) {
         $link->insert_before($h1);
@@ -97,7 +105,11 @@ if ( $update_readme ) {
 if ( $update_wiki ) {
     my $preamble = path 'wiki-preamble.md';
     $preamble->copy( $wiki_home );
-    $wiki_home->append_utf8(join "\n", @wiki_index);
+    my $in = join "\n", @wiki_index;
+    my($out, $err);
+    my @pandoc = qw[ pandoc -r markdown -w html ];
+    run \@pandoc, \$in, \$out, \$err, timeout( 10 ) or die "pandoc: $err";
+    $wiki_home->append_utf8($out);
     $repo->run( add => $wiki_home );
 }
 
