@@ -1,2 +1,13 @@
+=encoding UTF-8
+
 This is the documentation for L<< pandoc-no-header-span-ids.pl|http://git.io/vLXwl >>.
+
+=head1 DESCRIPTION
+
+Works around pandoc bug where spans with an id inside a header causes invalid LaTeX to be generated, by transferring the span's id to the header, I<unless> you have passed a metadata key C<< -M keep_header_ids=true >>.
+
+=head2 Warning
+
+You should run this filter after any other filters which rely on span ids!
+
 

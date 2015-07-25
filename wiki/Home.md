@@ -79,7 +79,7 @@ in one way or another.  You may want to read the abstracts in the [README](http:
 <td align="left"><code>pandoc-no-header-span-ids.pl</code></td>
 <td align="left">[[doc|pandoc-no-header-span-ids]]</td>
 <td align="left"><a href="http://git.io/vLXwl">code</a></td>
-<td align="left">2015-05-18</td>
+<td align="left">2015-07-25</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>pandoc-number-blocks.pl</code></td>

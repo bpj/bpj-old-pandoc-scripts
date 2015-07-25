@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
-use 5.014;
+# use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 no warnings qw[ uninitialized numeric ];
 
 use utf8;  # No UTF-8 I/O with JSON!
 
-use autodie 2.12;
+# use autodie 2.12;
 
 # no indirect;
 # no autovivification; # Don't pullute the AST!
@@ -28,6 +28,16 @@ my $JSON = JSON::MaybeXS->new( utf8 => 1 );
 
 my $doc = $JSON->decode( $json );
 
+my($keep_header_ids) = exists($doc->[0]{unMeta}{keep_header_ids})
+    ? (
+        rmap_hash { 
+            return unless is_elem($_, 'MetaBool');
+            cut $_->{c};
+        } $doc->[0]{unMeta}{keep_header_ids}
+    )
+    : 0;
+ 
+
 # Change elements in-place:
 rmap_hash {
     return unless is_elem( $_, 'Header' );
@@ -35,59 +45,52 @@ rmap_hash {
     return;
 } $doc;
 
-# Replace spans/divs with no id/classes/attributes with their contents
-# in their parents' content list.
-# This is generally much more robust than trying to call callbacks on hashes
-# while traversing with rmap_array!
-rmap_array {
-    my $aref = $_;
-    {
-        local $_;
-        return if none { is_elem( $_, qw[ Div Span ] ) } @$aref;
-    }
-    my @ret;
-    for my $elem ( @$aref ) {
-        if ( is_elem( $elem, qw[ Div Span ] ) ) {
-            if ( # Does it have any attributes?
-                length( $elem->{c}[-2][0] )         # id
-                or scalar( @{ $elem->{c}[-2][1] } ) # classes
-                or scalar( @{ $elem->{c}[-2][2] } ) # key_vals
-            ) {
-                push @ret, $elem;
-            }
-            else {  # No attributes!
-                push @ret, @{ $elem->{c}[-1] };  # Contents
-            }
-        }
-        else {
-            push @ret, $elem;
-        }
-    }
-    $_ = \@ret;
-} $doc;
-
+# # Replace spans/divs with no id/classes/attributes with their contents
+# # in their parents' content list.
+# # This is generally much more robust than trying to call callbacks on hashes
+# # while traversing with rmap_array!
+# rmap_array {
+#     my $aref = $_;
+#     {
+#         local $_;
+#         return if none { is_elem( $_, qw[ Div Span ] ) } @$aref;
+#     }
+#     my @ret;
+#     for my $elem ( @$aref ) {
+#         if ( is_elem( $elem, qw[ Div Span ] ) ) {
+#             if ( # Does it have any attributes?
+#                 length( $elem->{c}[-2][0] )         # id
+#                 or scalar( @{ $elem->{c}[-2][1] } ) # classes
+#                 or scalar( @{ $elem->{c}[-2][2] } ) # key_vals
+#             ) {
+#                 push @ret, $elem;
+#             }
+#             else {  # No attributes!
+#                 push @ret, @{ $elem->{c}[-1] };  # Contents
+#             }
+#         }
+#         else {
+#             push @ret, $elem;
+#         }
+#     }
+#     $_ = \@ret;
+# } $doc;
 
 print {*STDOUT} $JSON->encode( $doc );
 
 sub fix_spans_in_header {
     my($header) = @_;
+    my $header_id = \$header->{c}[-2][0];
     my($id) = # Change elements in-place:
     rmap_hash {
         return unless is_elem( $_, qw[ Span ] );
         my $span = $_;
         my $span_id = \$span->{c}[-2][0];
-        my $header_id = \$header->{c}[-2][0];
         return unless $$span_id;
         # Transfer span attrs if any to the header
-        $$header_id ||= $$span_id;
+        $$header_id = $$span_id unless $keep_header_ids;
         $$span_id = q{};
-        ATTRS:
-        for my $i ( 1, 2 ) {
-            my $span_attrs = $span->{c}[-2][$i];
-            my $header_attrs = $header->{c}[-2][$i];
-            push @$header_attrs, @$span_attrs;
-            @$span_attrs = ();
-        }
+        cut; # Already saw a span with id!
     } $header;
 }
 
@@ -129,3 +132,13 @@ sub mk_attr_elem {
 
 
 __END__
+
+=encoding UTF-8
+
+=head1 DESCRIPTION
+
+Works around pandoc bug where spans with an id inside a header causes invalid LaTeX to be generated, by transferring the span's id to the header, I<unless> you have passed a metadata key C<< -M keep_header_ids=true >>.
+
+=head2 Warning
+
+You should run this filter after any other filters which rely on span ids!
