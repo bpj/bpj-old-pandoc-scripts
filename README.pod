@@ -98,7 +98,10 @@ Documentation for pandoc-no-header-links.pl still to be written!
 
 =head3 pandoc-no-header-span-ids.pl
 
-Works around pandoc bug where spans with an id inside a header causes invalid LaTeX to be generated, by transferring the span's id to the header, I<unless> you have passed a metadata key C<< -M keep_header_ids=true >>.
+Works around a pandoc bug where spans with an id inside a header causes
+invalid LaTeX to be generated, by transferring the span's id to the header,
+I<unless> there is a metadata entry C<< -M keep_header_ids=true >>.
+It is especially useful when you convert HTML fetched from the Web.
 
 
 

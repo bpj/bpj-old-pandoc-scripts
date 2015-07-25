@@ -2,12 +2,53 @@
 
 This is the documentation for L<< pandoc-no-header-span-ids.pl|http://git.io/vLXwl >>.
 
+=head1 NAME
+
+C<pandoc-no-header-span-ids.pl> - pandoc filter to make sure spans embedded in headers have no id.
+
+=head1 VERSION
+
+0.003
+
+=head1 SYNOPSIS
+
+    pandoc --to=latex -F pandoc-no-header-span-ids.pl [OPTIONS] [FILE]...
+
 =head1 DESCRIPTION
 
-Works around pandoc bug where spans with an id inside a header causes invalid LaTeX to be generated, by transferring the span's id to the header, I<unless> you have passed a metadata key C<< -M keep_header_ids=true >>.
+Works around a pandoc bug where spans with an id inside a header causes
+invalid LaTeX to be generated, by transferring the span's id to the header,
+I<unless> there is a metadata entry C<< -M keep_header_ids=true >>.
+It is especially useful when you convert HTML fetched from the Web.
 
 =head2 Warning
 
 You should run this filter after any other filters which rely on span ids!
 
+=head1 OPTIONS
+
+You can pass options to the filter as Pandoc metadata values:
+
+    -M <option>=<value>
+
+Currently all the options expect boolean values C<true> or C<false>.
+
+The currently recognised options are:
+
+=over
+
+=item C<< -M keep_header_ids=<true|false> >>
+
+Don't replace the ids of headers with the id of the first contained span, if any.
+
+=item C<< -M optimize_attrless=<true|false> >>
+
+Optimize away divs and spans which have no attributes,
+replacing them with their contents in their parent's
+contents.
+
+B<WARNING:> This affects I<all> divs and spans in the whole document,
+not just those which have had their id removed by this filter!
+
+=back
 
