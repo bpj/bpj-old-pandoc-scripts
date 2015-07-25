@@ -87,7 +87,7 @@ my %opt;
 
 for my $name ( qw [ keep_header_ids optimize_attrless ] ) {
     next unless exists( $doc->[0]{unMeta}{$name} );
-    my ( $opt{$name} ) = rmap_hash {
+    ( $opt{$name} ) = rmap_hash {
         return unless is_elem( $_, 'MetaBool' );
         cut $_->{c};
     } $doc->[0]{unMeta}{$name};
